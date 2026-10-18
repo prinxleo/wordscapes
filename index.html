@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IshqWords 3D • Couple Wordscapes & Live Video</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ios-glass: rgba(255, 255, 255, 0.16);
+      --ios-glass-strong: rgba(24, 18, 43, 0.68);
+      --ios-border: rgba(255, 255, 255, 0.32);
+      --ios-highlight: rgba(255, 255, 255, 0.55);
+      --rose-glow: #ff4d8d;
+      --gold-glow: #fbbf24;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0f0a1e;
+      color: #ffffff;
+    }
+    .font-display {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+    #bg3d {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* Modern iOS 18 VisionOS Glassmorphic surfaces */
+    .ios-glass {
+      background: linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%);
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow:
+        0 20px 45px -12px rgba(8, 5, 24, 0.55),
+        inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    }
+    .ios-glass-dark {
+      background: linear-gradient(155deg, rgba(22, 16, 42, 0.82) 0%, rgba(14, 10, 28, 0.72) 100%);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow:
+        0 24px 48px -12px rgba(0, 0, 0, 0.65),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25);
+    }
+    .ios-pill-btn {
+      background: linear-gradient(180deg, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.12) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      box-shadow:
+        0 6px 16px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+      transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.16s ease, background 0.2s ease;
+    }
+    .ios-pill-btn:hover {
+      transform: translateY(-1px) scale(1.02);
+    }
+    .ios-pill-btn:active {
+      transform: translateY(1px) scale(0.96);
+    }
+    .ios-primary-btn {
+      background: linear-gradient(135deg, #ff4d8d 0%, #ff758f 50%, #fbbf24 100%);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow:
+        0 10px 24px -4px rgba(255, 77, 141, 0.65),
+        0 4px 0 #be185d,
+        inset 0 1px 1px rgba(255, 255, 255, 0.75);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+    }
+    .ios-primary-btn:active {
+      transform: translateY(3px);
+      box-shadow:
+        0 4px 12px -2px rgba(255, 77, 141, 0.55),
+        0 1px 0 #be185d,
+        inset 0 1px 1px rgba(255, 255, 255, 0.75);
+    }
+    /* 3D Tactile Crossword Tiles */
+    .tile-3d {
+      perspective: 600px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .tile-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      position: relative;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.09) 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      box-shadow:
+        0 4px 0 rgba(15, 10, 35, 0.45),
+        0 8px 16px rgba(0, 0, 0, 0.28),
+        inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      color: transparent;
+    }
+    .tile-inner.revealed-self {
+      background: linear-gradient(180deg, #fffbeb 0%, #fde68a 100%);
+      border: 1.5px solid #ffffff;
+      color: #831843;
+      box-shadow:
+        0 4px 0 #d97706,
+        0 10px 20px rgba(251, 191, 36, 0.45),
+        inset 0 2px 1px #ffffff;
+      transform: translateY(-2px) rotateX(8deg);
+    }
+    .tile-inner.revealed-partner {
+      background: linear-gradient(180deg, #ffe4e6 0%, #fda4af 100%);
+      border: 1.5px solid #ffffff;
+      color: #881337;
+      box-shadow:
+        0 4px 0 #e11d48,
+        0 10px 20px rgba(255, 77, 141, 0.48),
+        inset 0 2px 1px #ffffff;
+      transform: translateY(-2px) rotateX(8deg);
+    }
+    .tile-inner.hint-revealed {
+      background: linear-gradient(180deg, rgba(253, 230, 138, 0.42) 0%, rgba(251, 191, 36, 0.24) 100%);
+      border: 1.5px dashed #fde047;
+      color: #fef08a;
+    }
+    /* 3D Letter Wheel Keys */
+    .wheel-letter {
+      width: 56px;
+      height: 56px;
+      margin-left: -28px;
+      margin-top: -28px;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, #ffffff 0%, #fce7f3 100%);
+      color: #831843;
+      font-weight: 800;
+      font-size: 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow:
+        0 6px 0 #db2777,
+        0 10px 20px rgba(0, 0, 0, 0.35),
+        inset 0 2px 2px #ffffff;
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+      touch-action: none;
+    }
+    .wheel-letter.selected {
+      background: linear-gradient(135deg, #ff4d8d 0%, #fbbf24 100%);
+      color: #ffffff;
+      transform: scale(1.16) translateY(-3px);
+      box-shadow:
+        0 5px 0 #9d174d,
+        0 0 24px rgba(255, 77, 141, 0.85),
+        inset 0 2px 2px rgba(255, 255, 255, 0.8);
+    }
+    @keyframes floatReaction {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      20% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+      80% { transform: translateY(-85px) scale(1); opacity: 0.9; }
+      100% { transform: translateY(-120px) scale(0.8); opacity: 0; }
+    }
+    .reaction-float {
+      animation: floatReaction 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.06); opacity: 0.35; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-ring {
+      animation: pulseRing 2.4s infinite ease-in-out;
+    }
+    video {
+      object-fit: cover;
+    }
+    .mirror-video {
+      transform: scaleX(-1);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen flex flex-col justify-between overflow-x-hidden">
+  <!-- Interactive 3D Three.js Romantic Sky & Floating Islands Canvas -->
+  <canvas id="bg3d"></canvas>
+
+  <!-- Floating Reaction Stream Container -->
+  <div id="reactionStage" class="fixed inset-0 pointer-events-none z-40 overflow-hidden"></div>
+
+  <!-- Toast Notification Pill (Dynamic Island Style) -->
+  <div id="toastBanner" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 -translate-y-4 transition-all duration-300">
+    <div class="ios-glass-dark px-4 py-2 rounded-full flex items-center gap-2.5 text-xs sm:text-sm font-semibold shadow-2xl border border-pink-400/40">
+      <span id="toastIcon" class="text-base">✨</span>
+      <span id="toastText" class="text-white tracking-wide">Connected!</span>
+    </div>
+  </div>
+
+  <!-- TOP BAR: iOS Dynamic Island Header -->
+  <header class="relative z-20 w-full max-w-5xl mx-auto px-3 pt-2.5 pb-1 flex items-center justify-between gap-2">
+    <!-- Brand + Connection Badge -->
+    <div class="flex items-center gap-2">
+      <button id="btnOpenConnectModal" type="button" class="ios-glass px-3 py-1.5 rounded-2xl flex items-center gap-2 hover:bg-white/20 transition">
+        <span id="connDot" class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]"></span>
+        <div class="text-left">
+          <div class="text-[10px] uppercase tracking-wider text-pink-200 font-bold leading-none">Couple Room</div>
+          <div id="roomCodeBadge" class="text-xs sm:text-sm font-extrabold text-white tracking-wider">TAP TO CONNECT</div>
+        </div>
+      </button>
+
+      <button id="btnLevelPicker" type="button" class="ios-pill-btn px-3 py-1.5 rounded-2xl text-left">
+        <div class="text-[10px] uppercase tracking-wider text-amber-200 font-bold leading-none" id="levelCounterLabel">LEVEL 1 / 8</div>
+        <div class="text-xs sm:text-sm font-bold text-white truncate max-w-[130px] sm:max-w-[190px]" id="levelTitleLabel">Pehli Nazar</div>
+      </button>
+    </div>
+
+    <!-- Center / Right Controls: Synced Couple Score, Theme, Sound, Netlify Guide -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <div class="ios-glass px-3 py-1.5 rounded-2xl flex items-center gap-2.5">
+        <div class="flex items-center gap-1" title="Your Score">
+          <span class="text-xs">💛</span>
+          <span id="myScoreLabel" class="text-xs sm:text-sm font-extrabold text-amber-300">0</span>
+        </div>
+        <span class="text-white/30 text-xs">|</span>
+        <div class="flex items-center gap-1" title="Partner Score">
+          <span class="text-xs">💗</span>
+          <span id="partnerScoreLabel" class="text-xs sm:text-sm font-extrabold text-pink-300">0</span>
+        </div>
+      </div>
+
+      <button id="btnCustomWordModal" type="button" class="ios-pill-btn px-2.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1" title="Create Custom Couple Puzzle">
+        <span>💌</span>
+        <span class="hidden md:inline">Custom</span>
+      </button>
+
+      <button id="btnSoundToggle" type="button" class="ios-pill-btn w-9 h-9 rounded-xl flex items-center justify-center text-sm" title="Mute / Unmute Sound">
+        <span id="soundIcon">🔊</span>
+      </button>
+
+      <button id="btnNetlifyGuide" type="button" class="ios-pill-btn px-2.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 text-emerald-200 border-emerald-300/40" title="How to Deploy on Netlify">
+        <span>🚀</span>
+        <span class="hidden sm:inline">Netlify</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE: Responsive Split/Stacked Layout for Crossword + Dual Live Video + 3D Wheel -->
+  <main class="relative z-10 flex-1 w-full max-w-5xl mx-auto px-3 py-1 flex flex-col lg:flex-row items-center justify-between gap-3">
+    
+    <!-- LEFT / TOP PANEL: Live Couple FaceTime PiP Card + Crossword Grid -->
+    <div class="w-full lg:w-7/12 flex flex-col items-center gap-2">
+      
+      <!-- LIVE COUPLE CAMERA STREAM BAR (iOS FaceTime Dual PiP Dock) -->
+      <div class="w-full ios-glass rounded-3xl p-2 sm:p-2.5 flex items-center justify-between gap-2.5">
+        <!-- Dual Video Feeds -->
+        <div class="flex items-center gap-2">
+          <!-- Partner Video Card -->
+          <div class="relative w-24 h-16 sm:w-32 sm:h-20 rounded-2xl overflow-hidden bg-slate-900/90 border border-pink-400/50 shadow-lg flex-shrink-0">
+            <video id="remoteVideo" autoplay playsinline class="w-full h-full hidden"></video>
+            <div id="remoteFallback" class="w-full h-full flex flex-col items-center justify-center relative">
+              <img src="data:image/jpeg;base64,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" alt="Partner Avatar" class="w-full h-full object-cover opacity-80" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-1.5">
+                <span id="partnerVideoBadge" class="text-[10px] font-bold text-pink-200 leading-tight truncate">Partner • Waiting</span>
+              </div>
+            </div>
+            <!-- Partner Live Swipe / Activity Pill -->
+            <div id="partnerActivityPill" class="hidden absolute top-1 left-1 bg-pink-600/90 backdrop-blur px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white animate-pulse">
+              Swiping...
+            </div>
+          </div>
+
+          <!-- Local Camera Video Card -->
+          <div class="relative w-20 h-16 sm:w-28 sm:h-20 rounded-2xl overflow-hidden bg-slate-900/90 border border-amber-300/50 shadow-lg flex-shrink-0">
+            <video id="localVideo" autoplay muted playsinline class="w-full h-full mirror-video hidden"></video>
+            <div id="localFallback" class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-rose-950 to-indigo-950 p-1.5 text-center">
+              <span class="text-lg">📷</span>
+              <span id="localCamStatusText" class="text-[9px] text-amber-200 font-semibold leading-tight">Cam Off</span>
+            </div>
+            <div class="absolute bottom-1 left-1.5 right-1.5 flex items-center justify-between pointer-events-none">
+              <span class="text-[9px] font-bold bg-black/50 px-1.5 py-0.5 rounded text-amber-200">You</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video Controls + Romantic Note + Quick Reactions -->
+        <div class="flex-1 min-w-0 flex flex-col justify-between gap-1.5">
+          <div class="flex items-center justify-between gap-1">
+            <p id="loveNoteBanner" class="text-[11px] sm:text-xs text-pink-100/90 italic truncate">
+              "Every love story starts with a tiny spark across the distance."
+            </p>
+            <span id="bonusCountBadge" class="flex-shrink-0 text-[10px] font-bold bg-amber-400/20 border border-amber-300/40 text-amber-200 px-2 py-0.5 rounded-full">
+              ⭐ 0 Bonus
+            </span>
+          </div>
+
+          <!-- Camera & Reaction Buttons Row -->
+          <div class="flex items-center justify-between gap-1 flex-wrap">
+            <div class="flex items-center gap-1">
+              <button id="btnToggleCam" type="button" class="ios-pill-btn px-2.5 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 text-white">
+                <span id="camBtnIcon">📹</span>
+                <span id="camBtnLabel">Start Cam</span>
+              </button>
+              <button id="btnToggleMic" type="button" class="ios-pill-btn px-2 py-1 rounded-xl text-[11px] font-bold text-white" title="Toggle Microphone">
+                <span id="micBtnIcon">🎙️</span>
+              </button>
+              <button id="btnDemoPartner" type="button" class="ios-pill-btn px-2 py-1 rounded-xl text-[11px] font-semibold text-pink-200" title="Simulate AI Partner Co-Op">
+                <span id="demoPartnerLabel">🤖 Co-Op Bot: Off</span>
+              </button>
+            </div>
+
+            <!-- Live Reaction Buttons -->
+            <div class="flex items-center gap-1">
+              <button type="button" data-reaction="❤️" class="reaction-btn ios-pill-btn w-7 h-7 rounded-full flex items-center justify-center text-xs">❤️</button>
+              <button type="button" data-reaction="😘" class="reaction-btn ios-pill-btn w-7 h-7 rounded-full flex items-center justify-center text-xs">😘</button>
+              <button type="button" data-reaction="🔥" class="reaction-btn ios-pill-btn w-7 h-7 rounded-full flex items-center justify-center text-xs">🔥</button>
+              <button type="button" data-reaction="🎉" class="reaction-btn ios-pill-btn w-7 h-7 rounded-full flex items-center justify-center text-xs">🎉</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D CROSSWORD BOARD STAGE -->
+      <div class="w-full ios-glass rounded-3xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[230px] sm:min-h-[275px] relative">
+        <div class="w-full flex items-center justify-between mb-1.5 px-1">
+          <span id="themeSubtitleBadge" class="text-[11px] font-bold uppercase tracking-wider text-pink-200/90">
+            🌅 Sunset Paris Terrace
+          </span>
+          <span id="wordsRemainingBadge" class="text-[11px] font-bold text-amber-200">
+            0 / 6 Words Found
+          </span>
+        </div>
+
+        <!-- Dynamic 3D Crossword Grid Container -->
+        <div id="crosswordGrid" class="grid gap-1.5 sm:gap-2 my-auto place-items-center"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT / BOTTOM PANEL: Wordscapes 3D Circular Letter Wheel & Tactile Controls -->
+    <div class="w-full lg:w-5/12 flex flex-col items-center justify-center gap-2.5 pb-1">
+      
+      <!-- Current Swiped Word Preview Pill -->
+      <div class="h-11 flex items-center justify-center gap-2">
+        <div id="currentWordPill" class="ios-glass-dark px-5 py-1.5 rounded-full text-lg sm:text-xl font-extrabold tracking-[0.22em] text-amber-300 min-w-[120px] text-center shadow-lg transition-all duration-150 opacity-80">
+          SWIPE
+        </div>
+      </div>
+
+      <!-- Circular Wheel + Side Action Buttons -->
+      <div class="relative flex items-center justify-center gap-3 sm:gap-5">
+        <!-- Shuffle Wheel Button -->
+        <button id="btnShuffleWheel" type="button" class="ios-pill-btn w-12 h-12 rounded-2xl flex flex-col items-center justify-center text-white shadow-lg" title="Shuffle Letters">
+          <span class="text-base leading-none">🔀</span>
+          <span class="text-[9px] font-bold mt-0.5 text-pink-200">Shuffle</span>
+        </button>
+
+        <!-- The 3D Interactive Wordscapes Wheel -->
+        <div id="wheelContainer" class="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full ios-glass flex items-center justify-center shadow-2xl border-2 border-white/30 touch-none">
+          <!-- Inner glowing ring -->
+          <div class="w-40 h-40 sm:w-44 sm:h-44 rounded-full border border-pink-300/30 bg-gradient-to-br from-pink-500/15 to-amber-500/10 pointer-events-none pulse-ring"></div>
+
+          <!-- Center Heart Emblem / Tap to Submit -->
+          <button id="btnSubmitWord" type="button" class="z-10 w-14 h-14 rounded-full ios-primary-btn flex flex-col items-center justify-center text-white shadow-xl" title="Submit Word">
+            <span class="text-base leading-none">💖</span>
+            <span class="text-[8px] font-extrabold uppercase tracking-tighter mt-0.5">Go</span>
+          </button>
+
+          <!-- SVG Line Connector for Dragging Letters -->
+          <svg id="wheelSvg" class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 240 240">
+            <defs>
+              <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff4d8d" />
+                <stop offset="100%" stop-color="#fbbf24" />
+              </linearGradient>
+            </defs>
+            <polyline id="wheelLine" fill="none" stroke="url(#lineGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" points="" />
+          </svg>
+
+          <!-- Letter Nodes Container -->
+          <div id="wheelNodes" class="absolute inset-0 z-20"></div>
+        </div>
+
+        <!-- Hint Button -->
+        <button id="btnHint" type="button" class="ios-pill-btn w-12 h-12 rounded-2xl flex flex-col items-center justify-center text-white shadow-lg" title="Reveal Letter Hint">
+          <span class="text-base leading-none">💡</span>
+          <span class="text-[9px] font-bold mt-0.5 text-amber-200">Hint</span>
+        </button>
+      </div>
+
+      <!-- Quick Couple Love Chat Bar + Keyboard Input Support -->
+      <div class="w-full max-w-sm ios-glass rounded-2xl p-1.5 flex items-center gap-1.5">
+        <input id="chatInput" type="text" maxlength="60" placeholder="Send a sweet note or type a word..." class="flex-1 bg-white/10 text-white placeholder-pink-200/60 text-xs px-3 py-2 rounded-xl border border-white/20 focus:outline-none focus:border-pink-400 select-text" />
+        <button id="btnSendChat" type="button" class="ios-primary-btn px-3 py-2 rounded-xl text-xs font-bold text-white">
+          Send 💬
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL 1: SECRET CODE COUPLE CONNECTION & LIVE CAMERA LOBBY -->
+  <div id="connectModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="ios-glass-dark w-full max-w-md rounded-3xl p-5 sm:p-6 border border-white/25 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2.5">
+          <img src="data:image/jpeg;base64,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" alt="Couple Emblem" class="w-11 h-11 rounded-2xl object-cover border border-pink-400/50" />
+          <div>
+            <h2 class="font-display text-lg font-extrabold text-white">Couple Secret Connect</h2>
+            <p class="text-xs text-pink-200/80">Real-Time Words + Live Camera Video</p>
+          </div>
+        </div>
+        <button id="btnCloseConnectModal" type="button" class="ios-pill-btn w-8 h-8 rounded-full flex items-center justify-center text-xs">✕</button>
+      </div>
+
+      <!-- Secret Code Input / Generator -->
+      <div class="bg-white/10 rounded-2xl p-3.5 border border-white/15 mb-3">
+        <label for="secretCodeInput" class="block text-[11px] uppercase tracking-wider text-amber-200 font-bold mb-1.5">
+          Enter or Generate Couple Secret Code
+        </label>
+        <div class="flex items-center gap-2">
+          <input id="secretCodeInput" type="text" maxlength="12" value="LUV786" class="flex-1 bg-slate-950/70 text-center font-display text-lg font-extrabold tracking-[0.25em] uppercase text-white py-2 px-3 rounded-xl border border-pink-400/50 focus:outline-none select-text" />
+          <button id="btnRandomCode" type="button" class="ios-pill-btn px-3 py-2.5 rounded-xl text-xs font-bold" title="New Code">🎲 New</button>
+          <button id="btnCopyCode" type="button" class="ios-pill-btn px-3 py-2.5 rounded-xl text-xs font-bold text-amber-200" title="Copy Secret Code">📋 Copy</button>
+        </div>
+        <p class="text-[11px] text-pink-100/75 mt-2 leading-relaxed">
+          Dono partners apne phone par game open kar ke same <strong>Secret Code</strong> dalein: ek partner <strong>Host Room</strong> dabayega aur dusra <strong>Join Partner</strong>.
+        </p>
+      </div>
+
+      <!-- Host vs Join Buttons -->
+      <div class="grid grid-cols-2 gap-2.5 mb-3">
+        <button id="btnHostRoom" type="button" class="ios-primary-btn py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5">
+          <span>👑 Create / Host Room</span>
+          <span class="text-[10px] font-normal text-white/90">Partner 1 (Wait for join)</span>
+        </button>
+        <button id="btnJoinRoom" type="button" class="ios-pill-btn py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5 bg-indigo-500/30 border-indigo-300/50">
+          <span>💞 Join Partner Room</span>
+          <span class="text-[10px] font-normal text-indigo-200">Partner 2 (Connect now)</span>
+        </button>
+      </div>
+
+      <!-- Connection Status Box -->
+      <div id="modalConnStatus" class="bg-slate-900/70 rounded-xl p-2.5 text-xs text-center text-amber-200 border border-white/10 mb-3">
+        Ready! Choose Host or Join, or play right away with Demo Partner.
+      </div>
+
+      <!-- Solo / Instant Play Button -->
+      <button id="btnStartSoloOrDemo" type="button" class="w-full ios-pill-btn py-2.5 rounded-2xl text-xs font-bold text-pink-200 hover:text-white">
+        ✨ Play Immediately (Solo / AI Partner Co-Op Mode)
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 2: LEVEL SELECTOR & THEMES -->
+  <div id="levelModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="ios-glass-dark w-full max-w-md rounded-3xl p-5 border border-white/25 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display text-lg font-extrabold text-white">Select Romantic Level</h2>
+        <button id="btnCloseLevelModal" type="button" class="ios-pill-btn w-8 h-8 rounded-full flex items-center justify-center text-xs">✕</button>
+      </div>
+      <div id="levelListContainer" class="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: CUSTOM COUPLE PUZZLE CREATOR -->
+  <div id="customWordModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="ios-glass-dark w-full max-w-md rounded-3xl p-5 border border-white/25 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display text-lg font-extrabold text-white">💌 Create Custom Couple Level</h2>
+        <button id="btnCloseCustomModal" type="button" class="ios-pill-btn w-8 h-8 rounded-full flex items-center justify-center text-xs">✕</button>
+      </div>
+      <p class="text-xs text-pink-200/80 mb-3">
+        Surprise your partner with a custom 4 to 6 letter word (like your nickname, favorite city, or special memory) and a romantic love note!
+      </p>
+      <div class="space-y-2.5 mb-4">
+        <div>
+          <label for="customMainWord" class="block text-[11px] font-bold text-amber-200 uppercase mb-1">Main Secret Word (4–6 Letters)</label>
+          <input id="customMainWord" type="text" maxlength="6" placeholder="e.g. LAHORE or JAANUM" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-sm font-bold uppercase select-text" />
+        </div>
+        <div>
+          <label for="customLoveNote" class="block text-[11px] font-bold text-pink-200 uppercase mb-1">Love Note Clue</label>
+          <input id="customLoveNote" type="text" maxlength="80" placeholder="e.g. Where we had our favorite chai together ☕❤️" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-xs select-text" />
+        </div>
+      </div>
+      <button id="btnCreateCustomLevel" type="button" class="w-full ios-primary-btn py-2.5 rounded-2xl font-bold text-sm text-white">
+        ✨ Build & Sync Custom Level
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 4: NETLIFY DEPLOYMENT INSTRUCTIONS -->
+  <div id="netlifyModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="ios-glass-dark w-full max-w-md rounded-3xl p-5 border border-white/25 shadow-2xl">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display text-lg font-extrabold text-emerald-300">🚀 Netlify Deployment Guide</h2>
+        <button id="btnCloseNetlifyModal" type="button" class="ios-pill-btn w-8 h-8 rounded-full flex items-center justify-center text-xs">✕</button>
+      </div>
+      <div class="space-y-2.5 text-xs text-pink-100/90 leading-relaxed">
+        <div class="bg-white/10 p-3 rounded-2xl border border-white/15">
+          <div class="font-bold text-amber-300 mb-1">1. 10-Second Netlify Drop</div>
+          <p>Download the ready-made <strong>couple_wordscapes_netlify.zip</strong> (or save this HTML file as <code>index.html</code>), open <strong>app.netlify.com/drop</strong>, and drag &amp; drop it. Netlify gives you an instant <code>https://...netlify.app</code> link!</p>
+        </div>
+        <div class="bg-white/10 p-3 rounded-2xl border border-white/15">
+          <div class="font-bold text-pink-300 mb-1">2. Connect Both Phones from Anywhere</div>
+          <p>Open your Netlify HTTPS link on both phones. Tap <strong>Start Cam</strong> to allow camera &amp; mic, enter the same <strong>Secret Code</strong> (e.g. <code>LUV786</code>), and one partner taps <strong>Host Room</strong> while the other taps <strong>Join Partner</strong>.</p>
+        </div>
+        <div class="bg-white/10 p-3 rounded-2xl border border-white/15">
+          <div class="font-bold text-emerald-300 mb-1">3. Zero-Backend WebRTC P2P</div>
+          <p>This game uses <strong>PeerJS WebRTC Data + Media Streams</strong> directly between your two browsers, so your live camera video, audio, and word swipes sync in real time without needing any paid server.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: LEVEL COMPLETE CELEBRATION -->
+  <div id="winModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="ios-glass-dark w-full max-w-sm rounded-3xl p-6 border border-amber-300/40 shadow-2xl text-center">
+      <div class="text-4xl mb-2">💞✨🏆</div>
+      <h2 id="winModalTitle" class="font-display text-xl font-extrabold text-white mb-1">Level Complete!</h2>
+      <p id="winModalQuote" class="text-xs text-pink-200 italic mb-4">"Together we solve every puzzle."</p>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="bg-white/10 rounded-2xl p-2.5">
+          <div class="text-[10px] uppercase text-amber-200 font-bold">Your Score</div>
+          <div id="winMyScore" class="text-lg font-extrabold text-amber-300">0</div>
+        </div>
+        <div class="bg-white/10 rounded-2xl p-2.5">
+          <div class="text-[10px] uppercase text-pink-200 font-bold">Partner Score</div>
+          <div id="winPartnerScore" class="text-lg font-extrabold text-pink-300">0</div>
+        </div>
+      </div>
+      <button id="btnNextLevel" type="button" class="w-full ios-primary-btn py-3 rounded-2xl font-extrabold text-sm text-white">
+        Next Romantic Level ➡️
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. VERIFIED COUPLE WORDSCAPES LEVELS DATA
+    // =========================================================================
+    const LEVELS = [
+  {
+    "id": 1,
+    "title": "Pehli Nazar \u2022 First Spark",
+    "subtitle": "Sunset Paris Terrace",
+    "theme": "sunset",
+    "note": "Every love story starts with a tiny spark across the distance.",
+    "letters": [
+      "L",
+      "O",
+      "V",
+      "E",
+      "R",
+      "S"
+    ],
+    "bonus": [
+      "LOVER",
+      "SORE",
+      "LORE",
+      "ROLE",
+      "SOLE",
+      "EROS"
+    ],
+    "words": [
+      {
+        "word": "LOVERS",
+        "row": 3,
+        "col": 1,
+        "dir": "H"
+      },
+      {
+        "word": "LOVE",
+        "row": 3,
+        "col": 1,
+        "dir": "V"
+      },
+      {
+        "word": "ROSE",
+        "row": 0,
+        "col": 4,
+        "dir": "V"
+      },
+      {
+        "word": "OVER",
+        "row": 5,
+        "col": 0,
+        "dir": "H"
+      },
+      {
+        "word": "ROVE",
+        "row": 3,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "LOSE",
+        "row": 1,
+        "col": 3,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Dil Ki Baat \u2022 Sweet Heart",
+    "subtitle": "Sakura Blossom Garden",
+    "theme": "sakura",
+    "note": "Miles cannot separate two hearts that speak the same language.",
+    "letters": [
+      "H",
+      "E",
+      "A",
+      "R",
+      "T",
+      "S"
+    ],
+    "bonus": [
+      "EARTH",
+      "STARE",
+      "TEARS",
+      "EAST",
+      "HEAR",
+      "RATE",
+      "HEAT",
+      "HATE",
+      "ARTS",
+      "REST"
+    ],
+    "words": [
+      {
+        "word": "HEARTS",
+        "row": 4,
+        "col": 2,
+        "dir": "H"
+      },
+      {
+        "word": "HEART",
+        "row": 4,
+        "col": 2,
+        "dir": "V"
+      },
+      {
+        "word": "SHARE",
+        "row": 0,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "STAR",
+        "row": 1,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "SEAT",
+        "row": 4,
+        "col": 7,
+        "dir": "V"
+      },
+      {
+        "word": "TEAR",
+        "row": 6,
+        "col": 0,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Khwabon Ka Safar \u2022 Dream Date",
+    "subtitle": "Starlight Rooftop Lounge",
+    "theme": "starlight",
+    "note": "Looking at you on my screen feels like stargazing from home.",
+    "letters": [
+      "D",
+      "R",
+      "E",
+      "A",
+      "M",
+      "S"
+    ],
+    "bonus": [
+      "DARES",
+      "MARE",
+      "MEAD",
+      "MADE",
+      "DAME",
+      "SEAM",
+      "ARMS",
+      "MARS",
+      "EARS",
+      "ERAS"
+    ],
+    "words": [
+      {
+        "word": "DREAMS",
+        "row": 3,
+        "col": 3,
+        "dir": "H"
+      },
+      {
+        "word": "DREAM",
+        "row": 3,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "DEAR",
+        "row": 0,
+        "col": 4,
+        "dir": "V"
+      },
+      {
+        "word": "SAME",
+        "row": 2,
+        "col": 6,
+        "dir": "V"
+      },
+      {
+        "word": "DARE",
+        "row": 5,
+        "col": 0,
+        "dir": "H"
+      },
+      {
+        "word": "READ",
+        "row": 0,
+        "col": 1,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Muskurahat \u2022 Sweet Smiles",
+    "subtitle": "Aurora Borealis Sky",
+    "theme": "aurora",
+    "note": "One smile from you on live video makes my whole day glow.",
+    "letters": [
+      "S",
+      "M",
+      "I",
+      "L",
+      "E",
+      "S"
+    ],
+    "bonus": [
+      "SLIMES",
+      "MILE",
+      "LESS",
+      "ISLE",
+      "ISLES",
+      "SEMI",
+      "MESS",
+      "ELMS",
+      "LIES"
+    ],
+    "words": [
+      {
+        "word": "SMILES",
+        "row": 4,
+        "col": 1,
+        "dir": "H"
+      },
+      {
+        "word": "SMILE",
+        "row": 4,
+        "col": 1,
+        "dir": "V"
+      },
+      {
+        "word": "MILES",
+        "row": 3,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "SLIME",
+        "row": 0,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "LIME",
+        "row": 6,
+        "col": 0,
+        "dir": "H"
+      },
+      {
+        "word": "MISS",
+        "row": 0,
+        "col": 3,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Hamesha Sath \u2022 Caring Soul",
+    "subtitle": "Maldives Overwater Villa",
+    "theme": "ocean",
+    "note": "Closeness isn't measured in kilometers\u2014it's measured in care.",
+    "letters": [
+      "C",
+      "A",
+      "R",
+      "I",
+      "N",
+      "G"
+    ],
+    "bonus": [
+      "RING",
+      "CRAG",
+      "IRAN",
+      "RANG"
+    ],
+    "words": [
+      {
+        "word": "CARING",
+        "row": 3,
+        "col": 3,
+        "dir": "H"
+      },
+      {
+        "word": "RACING",
+        "row": 1,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "GRAIN",
+        "row": 2,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "GAIN",
+        "row": 0,
+        "col": 7,
+        "dir": "V"
+      },
+      {
+        "word": "GRIN",
+        "row": 3,
+        "col": 8,
+        "dir": "V"
+      },
+      {
+        "word": "RAIN",
+        "row": 5,
+        "col": 0,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Chaand Raat \u2022 Starlight",
+    "subtitle": "Velvet Midnight Balcony",
+    "theme": "starlight",
+    "note": "You are my favorite notification and my sweetest goodnight.",
+    "letters": [
+      "L",
+      "I",
+      "G",
+      "H",
+      "T",
+      "S"
+    ],
+    "bonus": [
+      "SLIGHT",
+      "SIGH",
+      "HITS",
+      "GILT",
+      "SILT",
+      "SLIT"
+    ],
+    "words": [
+      {
+        "word": "LIGHTS",
+        "row": 2,
+        "col": 3,
+        "dir": "H"
+      },
+      {
+        "word": "LIGHT",
+        "row": 2,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "SIGHT",
+        "row": 0,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "THIS",
+        "row": 2,
+        "col": 7,
+        "dir": "V"
+      },
+      {
+        "word": "HILT",
+        "row": 6,
+        "col": 0,
+        "dir": "H"
+      },
+      {
+        "word": "LIST",
+        "row": 0,
+        "col": 3,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Khushboo \u2022 Blooming Love",
+    "subtitle": "Enchanted Rose Conservatory",
+    "theme": "sakura",
+    "note": "Like a rose in spring, every moment with you blooms brighter.",
+    "letters": [
+      "F",
+      "L",
+      "O",
+      "W",
+      "E",
+      "R"
+    ],
+    "bonus": [
+      "LORE",
+      "FOWL",
+      "FORE",
+      "FLEW",
+      "FLOE"
+    ],
+    "words": [
+      {
+        "word": "FLOWER",
+        "row": 3,
+        "col": 2,
+        "dir": "H"
+      },
+      {
+        "word": "LOWER",
+        "row": 3,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "FLOW",
+        "row": 0,
+        "col": 5,
+        "dir": "V"
+      },
+      {
+        "word": "WOLF",
+        "row": 0,
+        "col": 2,
+        "dir": "V"
+      },
+      {
+        "word": "WORE",
+        "row": 1,
+        "col": 7,
+        "dir": "V"
+      },
+      {
+        "word": "ROLE",
+        "row": 6,
+        "col": 0,
+        "dir": "H"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Humdum \u2022 Strong Forever",
+    "subtitle": "Golden Hour Cloud Palace",
+    "theme": "sunset",
+    "note": "Two phones, one secret code, and a lifetime of words together.",
+    "letters": [
+      "S",
+      "T",
+      "R",
+      "O",
+      "N",
+      "G"
+    ],
+    "bonus": [
+      "SNORT",
+      "TONGS",
+      "TONS",
+      "GROT"
+    ],
+    "words": [
+      {
+        "word": "STRONG",
+        "row": 5,
+        "col": 1,
+        "dir": "H"
+      },
+      {
+        "word": "SONG",
+        "row": 5,
+        "col": 1,
+        "dir": "V"
+      },
+      {
+        "word": "TORN",
+        "row": 3,
+        "col": 3,
+        "dir": "V"
+      },
+      {
+        "word": "SORT",
+        "row": 3,
+        "col": 0,
+        "dir": "H"
+      },
+      {
+        "word": "ROTS",
+        "row": 0,
+        "col": 0,
+        "dir": "V"
+      },
+      {
+        "word": "TONG",
+        "row": 3,
+        "col": 5,
+        "dir": "V"
+      }
+    ]
+  }
+];
+
+    // =========================================================================
+    // 2. SYNTHESIZED WEB AUDIO SOUND ENGINE (iOS Tactile Chimes & Harp)
+    // =========================================================================
+    const SoundFX = {
+      ctx: null,
+      muted: false,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      tone(freq, duration = 0.14, type = 'sine', vol = 0.12, delay = 0) {
+        if (this.muted) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime + delay;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        } catch (e) {}
+      },
+      playSelect(stepIndex) {
+        const scale = [330, 370, 415, 440, 493.88, 554.37, 659.25];
+        const freq = scale[stepIndex % scale.length];
+        this.tone(freq, 0.13, 'triangle', 0.14);
+      },
+      playSolved() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+          this.tone(f, 0.28, 'triangle', 0.15, i * 0.06);
+        });
+      },
+      playBonus() {
+        [587.33, 739.99, 880, 1174.66].forEach((f, i) => {
+          this.tone(f, 0.22, 'sine', 0.13, i * 0.05);
+        });
+      },
+      playWrong() {
+        this.tone(220, 0.15, 'sawtooth', 0.08, 0);
+        this.tone(196, 0.18, 'sawtooth', 0.08, 0.08);
+      },
+      playReaction() {
+        this.tone(659.25, 0.12, 'sine', 0.1, 0);
+        this.tone(880, 0.2, 'sine', 0.12, 0.06);
+      },
+      playWin() {
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+          this.tone(f, 0.36, 'triangle', 0.16, i * 0.08);
+        });
+      }
+    };
+
+    // =========================================================================
+    // 3. THREE.JS 3D ROMANTIC ENVIRONMENT (Floating Islands, 3D Hearts & Stars)
+    // =========================================================================
+    const Scene3D = {
+      scene: null,
+      camera: null,
+      renderer: null,
+      hearts: [],
+      particles: null,
+      islandGroup: null,
+      burstParticles: [],
+      targetRotX: 0,
+      targetRotY: 0,
+      themePalettes: {
+        sunset:    { bg1: 0x1e0b28, fog: 0x3b123c, light1: 0xff5e8e, light2: 0xfbbf24, heart: 0xff3b7f },
+        sakura:    { bg1: 0x230d26, fog: 0x43163b, light1: 0xff85b3, light2: 0xfbcfe8, heart: 0xff65a3 },
+        starlight: { bg1: 0x090b24, fog: 0x161a42, light1: 0x818cf8, light2: 0xf472b6, heart: 0xc084fc },
+        aurora:    { bg1: 0x061c24, fog: 0x0c343d, light1: 0x34d399, light2: 0x60a5fa, heart: 0x2dd4bf },
+        ocean:     { bg1: 0x081c38, fog: 0x0f3156, light1: 0x38bdf8, light2: 0xfbbf24, heart: 0xf43f5e }
+      },
+      ambientLight: null,
+      pointLight1: null,
+      pointLight2: null,
+
+      init() {
+        const canvas = document.getElementById('bg3d');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        this.scene = new THREE.Scene();
+        this.scene.fog = new THREE.FogExp2(0x3b123c, 0.032);
+
+        this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+        this.camera.position.set(0, 1.2, 11);
+
+        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        this.renderer.setClearColor(0x1e0b28, 1);
+
+        this.ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
+        this.scene.add(this.ambientLight);
+
+        this.pointLight1 = new THREE.PointLight(0xff5e8e, 2.2, 30);
+        this.pointLight1.position.set(6, 6, 6);
+        this.scene.add(this.pointLight1);
+
+        this.pointLight2 = new THREE.PointLight(0xfbbf24, 1.8, 30);
+        this.pointLight2.position.set(-6, -3, 5);
+        this.scene.add(this.pointLight2);
+
+        // Romantic Floating Crystal Islands
+        this.islandGroup = new THREE.Group();
+        this.scene.add(this.islandGroup);
+
+        const islandGeo = new THREE.CylinderGeometry(2.6, 1.1, 1.2, 7);
+        const islandMat = new THREE.MeshStandardMaterial({
+          color: 0x4c1d4b,
+          roughness: 0.45,
+          metalness: 0.2,
+          flatShading: true
+        });
+        const mainIsland = new THREE.Mesh(islandGeo, islandMat);
+        mainIsland.position.set(0, -3.3, -2);
+        this.islandGroup.add(mainIsland);
+
+        // 3D Heart Shape Geometry
+        const heartShape = new THREE.Shape();
+        const x = 0, y = 0;
+        heartShape.moveTo(x + 0.25, y + 0.25);
+        heartShape.bezierCurveTo(x + 0.25, y + 0.25, x + 0.2, y, x, y);
+        heartShape.bezierCurveTo(x - 0.3, y, x - 0.3, y + 0.35, x - 0.3, y + 0.35);
+        heartShape.bezierCurveTo(x - 0.3, y + 0.55, x - 0.1, y + 0.77, x + 0.25, y + 0.95);
+        heartShape.bezierCurveTo(x + 0.6, y + 0.77, x + 0.8, y + 0.55, x + 0.8, y + 0.35);
+        heartShape.bezierCurveTo(x + 0.8, y + 0.35, x + 0.8, y, x + 0.5, y);
+        heartShape.bezierCurveTo(x + 0.35, y, x + 0.25, y + 0.25, x + 0.25, y + 0.25);
+
+        const extrudeSettings = { depth: 0.22, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.08, bevelThickness: 0.08 };
+        const heartGeo = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+        heartGeo.center();
+
+        for (let i = 0; i < 14; i++) {
+          const mat = new THREE.MeshStandardMaterial({
+            color: i % 2 === 0 ? 0xff4d8d : 0xfbbf24,
+            roughness: 0.22,
+            metalness: 0.35
+          });
+          const mesh = new THREE.Mesh(heartGeo, mat);
+          mesh.rotation.z = Math.PI;
+          const angle = (i / 14) * Math.PI * 2;
+          const radius = 4.2 + (i % 3) * 1.6;
+          mesh.position.set(
+            Math.cos(angle) * radius,
+            (Math.random() - 0.35) * 5.5,
+            -2 - Math.random() * 5
+          );
+          const s = 0.42 + (i % 4) * 0.16;
+          mesh.scale.set(s, s, s);
+          mesh.userData = {
+            baseY: mesh.position.y,
+            speed: 0.8 + Math.random() * 0.9,
+            phase: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.02
+          };
+          this.hearts.push(mesh);
+          this.scene.add(mesh);
+        }
+
+        // Starlight / Blossom Particle Field
+        const pCount = 160;
+        const pGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(pCount * 3);
+        for (let i = 0; i < pCount * 3; i += 3) {
+          positions[i] = (Math.random() - 0.5) * 24;
+          positions[i + 1] = (Math.random() - 0.5) * 16;
+          positions[i + 2] = (Math.random() - 0.5) * 14 - 2;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const pMat = new THREE.PointsMaterial({ color: 0xffe4e6, size: 0.09, transparent: true, opacity: 0.75 });
+        this.particles = new THREE.Points(pGeo, pMat);
+        this.scene.add(this.particles);
+
+        window.addEventListener('resize', () => this.onResize());
+        window.addEventListener('pointermove', (e) => {
+          this.targetRotY = ((e.clientX / window.innerWidth) - 0.5) * 0.35;
+          this.targetRotX = ((e.clientY / window.innerHeight) - 0.5) * 0.2;
+        });
+
+        this.animate();
+      },
+
+      setTheme(themeName) {
+        if (!this.renderer) return;
+        const pal = this.themePalettes[themeName] || this.themePalettes.sunset;
+        this.renderer.setClearColor(pal.bg1, 1);
+        if (this.scene && this.scene.fog) this.scene.fog.color.setHex(pal.fog);
+        if (this.pointLight1) this.pointLight1.color.setHex(pal.light1);
+        if (this.pointLight2) this.pointLight2.color.setHex(pal.light2);
+      },
+
+      burstCelebration() {
+        this.hearts.forEach((h) => {
+          h.scale.multiplyScalar(1.22);
+          setTimeout(() => h.scale.multiplyScalar(1 / 1.22), 380);
+        });
+      },
+
+      onResize() {
+        if (!this.camera || !this.renderer) return;
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+      },
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        const t = performance.now() * 0.001;
+        this.hearts.forEach((h) => {
+          h.position.y = h.userData.baseY + Math.sin(t * h.userData.speed + h.userData.phase) * 0.45;
+          h.rotation.y += h.userData.rotSpeed;
+        });
+        if (this.islandGroup) {
+          this.islandGroup.rotation.y = t * 0.15;
+          this.islandGroup.position.y = Math.sin(t * 0.9) * 0.18;
+        }
+        if (this.particles) {
+          this.particles.rotation.y = t * 0.03;
+        }
+        if (this.camera) {
+          this.camera.rotation.y += (this.targetRotY - this.camera.rotation.y) * 0.05;
+          this.camera.rotation.x += (-this.targetRotX - this.camera.rotation.x) * 0.05;
+        }
+        if (this.renderer && this.scene && this.camera) {
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+    };
+
+    // =========================================================================
+    // 4. GAME STATE, CROSSWORD ENGINE & REAL-TIME COUPLE SYNC (PeerJS + Local)
+    // =========================================================================
+    const State = {
+      levelIndex: 0,
+      customLevel: null,
+      solvedWords: {}, // word -> 'self' | 'partner'
+      bonusWords: [],
+      revealedCells: {}, // "r,c" -> true
+      myScore: 0,
+      partnerScore: 0,
+      wheelOrder: [],
+      selectedIndices: [],
+      isDragging: false,
+      pointerPos: null,
+      demoBotActive: false,
+      demoBotTimer: null,
+
+      // WebRTC & Room Sync
+      roomCode: 'LUV786',
+      role: null, // 'host' | 'guest'
+      peer: null,
+      conn: null,
+      mediaCall: null,
+      localStream: null,
+      micEnabled: true,
+      bc: null
+    };
+
+    function showToast(icon, text) {
+      const banner = document.getElementById('toastBanner');
+      const iconEl = document.getElementById('toastIcon');
+      const textEl = document.getElementById('toastText');
+      if (!banner) return;
+      iconEl.textContent = icon;
+      textEl.textContent = text;
+      banner.classList.remove('opacity-0', '-translate-y-4');
+      banner.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(banner._timer);
+      banner._timer = setTimeout(() => {
+        banner.classList.add('opacity-0', '-translate-y-4');
+        banner.classList.remove('opacity-100', 'translate-y-0');
+      }, 2800);
+    }
+
+    function spawnFloatingReaction(emoji, labelText = '') {
+      const stage = document.getElementById('reactionStage');
+      if (!stage) return;
+      const el = document.createElement('div');
+      el.className = 'reaction-float absolute flex flex-col items-center pointer-events-none';
+      el.style.left = (20 + Math.random() * 60) + '%';
+      el.style.bottom = '18%';
+      el.innerHTML = `<span class="text-3xl sm:text-4xl drop-shadow-lg">${emoji}</span>` +
+        (labelText ? `<span class="mt-1 px-2.5 py-0.5 rounded-full bg-pink-600/90 text-white text-xs font-bold shadow-lg">${labelText}</span>` : '');
+      stage.appendChild(el);
+      SoundFX.playReaction();
+      setTimeout(() => el.remove(), 2200);
+    }
+
+    function getActiveLevel() {
+      return State.customLevel || LEVELS[State.levelIndex];
+    }
+
+    function loadLevel(idx, customObj = null, broadcast = true) {
+      if (customObj) {
+        State.customLevel = customObj;
+      } else {
+        State.customLevel = null;
+        State.levelIndex = ((idx % LEVELS.length) + LEVELS.length) % LEVELS.length;
+      }
+      const lv = getActiveLevel();
+      State.solvedWords = {};
+      State.bonusWords = [];
+      State.revealedCells = {};
+      State.wheelOrder = [...lv.letters];
+      State.selectedIndices = [];
+
+      document.getElementById('levelCounterLabel').textContent = State.customLevel
+        ? 'CUSTOM COUPLE LEVEL'
+        : `LEVEL ${lv.id} / ${LEVELS.length}`;
+      document.getElementById('levelTitleLabel').textContent = lv.title;
+      document.getElementById('loveNoteBanner').textContent = `"${lv.note}"`;
+      document.getElementById('themeSubtitleBadge').textContent = `✨ ${lv.subtitle}`;
+      document.getElementById('winModal').classList.add('hidden');
+
+      Scene3D.setTheme(lv.theme);
+      renderCrosswordGrid();
+      renderWheel();
+      updateScoreAndProgressUI();
+
+      if (broadcast) {
+        sendSyncMessage({
+          type: 'LOAD_LEVEL',
+          levelIndex: State.levelIndex,
+          customLevel: State.customLevel
+        });
+      }
+    }
+
+    function renderCrosswordGrid() {
+      const lv = getActiveLevel();
+      const gridEl = document.getElementById('crosswordGrid');
+      if (!gridEl) return;
+
+      // Calculate bounding box of the level's crossword grid
+      let maxR = 0, maxC = 0;
+      const cellMap = {}; // "r,c" -> { letter, words: [] }
+
+      lv.words.forEach((wobj) => {
+        const w = wobj.word;
+        for (let i = 0; i < w.length; i++) {
+          const r = wobj.row + (wobj.dir === 'V' ? i : 0);
+          const c = wobj.col + (wobj.dir === 'H' ? i : 0);
+          if (r > maxR) maxR = r;
+          if (c > maxC) maxC = c;
+          const key = `${r},${c}`;
+          if (!cellMap[key]) cellMap[key] = { letter: w[i], words: [] };
+          cellMap[key].words.push(w);
+        }
+      });
+
+      const rows = maxR + 1;
+      const cols = maxC + 1;
+      gridEl.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+      gridEl.innerHTML = '';
+
+      // Adaptive tile sizing so any grid fits comfortably on mobile & desktop
+      const maxDim = Math.max(rows, cols);
+      const sizeClass = maxDim >= 8
+        ? 'w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm'
+        : maxDim >= 7
+          ? 'w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base'
+          : 'w-9 h-9 sm:w-11 sm:h-11 text-base sm:text-lg';
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const key = `${r},${c}`;
+          const cell = cellMap[key];
+          const wrapper = document.createElement('div');
+          wrapper.className = `tile-3d ${sizeClass}`;
+          if (!cell) {
+            wrapper.className += ' opacity-0 pointer-events-none';
+            gridEl.appendChild(wrapper);
+            continue;
+          }
+
+          // Determine if solved by self, partner, or hinted
+          let solvedBy = null;
+          for (const w of cell.words) {
+            if (State.solvedWords[w]) {
+              solvedBy = State.solvedWords[w];
+              break;
+            }
+          }
+          const isHinted = !!State.revealedCells[key];
+
+          const inner = document.createElement('div');
+          inner.className = 'tile-inner';
+          if (solvedBy === 'self') {
+            inner.classList.add('revealed-self');
+            inner.textContent = cell.letter;
+          } else if (solvedBy === 'partner') {
+            inner.classList.add('revealed-partner');
+            inner.textContent = cell.letter;
+          } else if (isHinted) {
+            inner.classList.add('hint-revealed');
+            inner.textContent = cell.letter;
+          } else {
+            inner.textContent = '';
+          }
+
+          wrapper.appendChild(inner);
+          gridEl.appendChild(wrapper);
+        }
+      }
+    }
+
+    function updateScoreAndProgressUI() {
+      const lv = getActiveLevel();
+      const solvedCount = Object.keys(State.solvedWords).length;
+      const totalCount = lv.words.length;
+      document.getElementById('wordsRemainingBadge').textContent = `${solvedCount} / ${totalCount} Words Found`;
+      document.getElementById('myScoreLabel').textContent = State.myScore;
+      document.getElementById('partnerScoreLabel').textContent = State.partnerScore;
+      document.getElementById('bonusCountBadge').textContent = `⭐ ${State.bonusWords.length} Bonus`;
+
+      if (solvedCount === totalCount && totalCount > 0) {
+        setTimeout(() => {
+          SoundFX.playWin();
+          Scene3D.burstCelebration();
+          document.getElementById('winModalTitle').textContent = `${lv.title} Complete!`;
+          document.getElementById('winModalQuote').textContent = `"${lv.note}"`;
+          document.getElementById('winMyScore').textContent = State.myScore;
+          document.getElementById('winPartnerScore').textContent = State.partnerScore;
+          document.getElementById('winModal').classList.remove('hidden');
+        }, 420);
+      }
+    }
+
+    // =========================================================================
+    // 5. CIRCULAR WORDSCAPES 3D WHEEL & TOUCH/MOUSE SWIPE CONTROLLER
+    // =========================================================================
+    function getWheelNodeCoords(index, total) {
+      const radius = 80; // in 240x240 viewBox coordinates
+      const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
+      return {
+        x: 120 + Math.cos(angle) * radius,
+        y: 120 + Math.sin(angle) * radius
+      };
+    }
+
+    function renderWheel() {
+      const container = document.getElementById('wheelNodes');
+      if (!container) return;
+      container.innerHTML = '';
+      const total = State.wheelOrder.length;
+
+      State.wheelOrder.forEach((ch, idx) => {
+        const pt = getWheelNodeCoords(idx, total);
+        const btn = document.createElement('div');
+        btn.className = 'wheel-letter' + (State.selectedIndices.includes(idx) ? ' selected' : '');
+        btn.style.left = `${(pt.x / 240) * 100}%`;
+        btn.style.top = `${(pt.y / 240) * 100}%`;
+        btn.dataset.index = idx;
+        btn.textContent = ch;
+        container.appendChild(btn);
+      });
+      updateWheelSwipeLine();
+    }
+
+    function updateWheelSwipeLine() {
+      const line = document.getElementById('wheelLine');
+      const pill = document.getElementById('currentWordPill');
+      if (!line || !pill) return;
+
+      const total = State.wheelOrder.length;
+      const pts = State.selectedIndices.map((idx) => {
+        const c = getWheelNodeCoords(idx, total);
+        return `${c.x},${c.y}`;
+      });
+      if (State.isDragging && State.pointerPos && State.selectedIndices.length > 0) {
+        pts.push(`${State.pointerPos.x},${State.pointerPos.y}`);
+      }
+      line.setAttribute('points', pts.join(' '));
+
+      const currentWord = State.selectedIndices.map((i) => State.wheelOrder[i]).join('');
+      pill.textContent = currentWord || 'SWIPE';
+      pill.style.opacity = currentWord ? '1' : '0.75';
+    }
+
+    function setupWheelInteraction() {
+      const wheel = document.getElementById('wheelContainer');
+      if (!wheel) return;
+
+      function getLocalSvgCoords(clientX, clientY) {
+        const rect = wheel.getBoundingClientRect();
+        return {
+          x: ((clientX - rect.left) / rect.width) * 240,
+          y: ((clientY - rect.top) / rect.height) * 240
+        };
+      }
+
+      function hitTestNode(svgPt) {
+        const total = State.wheelOrder.length;
+        for (let i = 0; i < total; i++) {
+          const c = getWheelNodeCoords(i, total);
+          const dist = Math.hypot(svgPt.x - c.x, svgPt.y - c.y);
+          if (dist < 30) return i;
+        }
+        return -1;
+      }
+
+      wheel.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('#btnSubmitWord')) return;
+        const pt = getLocalSvgCoords(e.clientX, e.clientY);
+        const hit = hitTestNode(pt);
+        if (hit !== -1) {
+          State.isDragging = true;
+          State.selectedIndices = [hit];
+          State.pointerPos = pt;
+          SoundFX.playSelect(0);
+          renderWheel();
+          sendSyncMessage({ type: 'PARTNER_SWIPING', preview: State.wheelOrder[hit] });
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!State.isDragging) return;
+        const pt = getLocalSvgCoords(e.clientX, e.clientY);
+        State.pointerPos = pt;
+        const hit = hitTestNode(pt);
+        if (hit !== -1) {
+          const last = State.selectedIndices[State.selectedIndices.length - 1];
+          const secondLast = State.selectedIndices[State.selectedIndices.length - 2];
+          if (hit === secondLast) {
+            // Backtrack one letter
+            State.selectedIndices.pop();
+            SoundFX.playSelect(State.selectedIndices.length);
+            renderWheel();
+          } else if (!State.selectedIndices.includes(hit) && hit !== last) {
+            State.selectedIndices.push(hit);
+            SoundFX.playSelect(State.selectedIndices.length - 1);
+            renderWheel();
+            const word = State.selectedIndices.map((i) => State.wheelOrder[i]).join('');
+            sendSyncMessage({ type: 'PARTNER_SWIPING', preview: word });
+          }
+        }
+        updateWheelSwipeLine();
+      });
+
+      window.addEventListener('pointerup', () => {
+        if (!State.isDragging) return;
+        State.isDragging = false;
+        State.pointerPos = null;
+        const candidate = State.selectedIndices.map((i) => State.wheelOrder[i]).join('');
+        State.selectedIndices = [];
+        renderWheel();
+        if (candidate.length >= 3) {
+          submitCandidateWord(candidate, 'self', true);
+        }
+      });
+    }
+
+    function submitCandidateWord(word, who = 'self', broadcast = true) {
+      const upper = word.trim().toUpperCase();
+      if (!upper) return;
+      const lv = getActiveLevel();
+
+      // Check if it's a main crossword word
+      const matchObj = lv.words.find((w) => w.word === upper);
+      if (matchObj) {
+        if (State.solvedWords[upper]) {
+          if (who === 'self') showToast('✨', `"${upper}" is already on the board!`);
+          return;
+        }
+        State.solvedWords[upper] = who;
+        const pts = upper.length * 25;
+        if (who === 'self') {
+          State.myScore += pts;
+          showToast('💖', `You found "${upper}" (+${pts} pts)!`);
+        } else {
+          State.partnerScore += pts;
+          showToast('🌸', `Partner found "${upper}" (+${pts} pts)!`);
+        }
+        SoundFX.playSolved();
+        Scene3D.burstCelebration();
+        renderCrosswordGrid();
+        updateScoreAndProgressUI();
+
+        if (broadcast) {
+          sendSyncMessage({ type: 'WORD_SOLVED', word: upper, points: pts });
+        }
+        return;
+      }
+
+      // Check if it's a bonus word
+      if (lv.bonus && lv.bonus.includes(upper)) {
+        if (!State.bonusWords.includes(upper)) {
+          State.bonusWords.push(upper);
+          if (who === 'self') State.myScore += 15;
+          else State.partnerScore += 15;
+          SoundFX.playBonus();
+          showToast('⭐', `Bonus Word "${upper}" (+15 pts)!`);
+          updateScoreAndProgressUI();
+          if (broadcast) {
+            sendSyncMessage({ type: 'BONUS_WORD', word: upper });
+          }
+        } else if (who === 'self') {
+          showToast('⭐', `Bonus word "${upper}" already collected!`);
+        }
+        return;
+      }
+
+      if (who === 'self') {
+        SoundFX.playWrong();
+        const pill = document.getElementById('currentWordPill');
+        pill.textContent = upper;
+        pill.classList.add('text-rose-400');
+        setTimeout(() => {
+          pill.classList.remove('text-rose-400');
+          pill.textContent = 'SWIPE';
+        }, 450);
+      }
+    }
+
+    function triggerHint(broadcast = true) {
+      const lv = getActiveLevel();
+      const unrevealed = [];
+      lv.words.forEach((wobj) => {
+        if (State.solvedWords[wobj.word]) return;
+        for (let i = 0; i < wobj.word.length; i++) {
+          const r = wobj.row + (wobj.dir === 'V' ? i : 0);
+          const c = wobj.col + (wobj.dir === 'H' ? i : 0);
+          const key = `${r},${c}`;
+          if (!State.revealedCells[key]) {
+            unrevealed.push(key);
+          }
+        }
+      });
+      if (unrevealed.length === 0) {
+        showToast('💡', 'All letters are already visible!');
+        return;
+      }
+      const pick = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+      State.revealedCells[pick] = true;
+      SoundFX.playBonus();
+      renderCrosswordGrid();
+      showToast('💡', 'Hint revealed a letter on the board!');
+      if (broadcast) {
+        sendSyncMessage({ type: 'HINT_CELL', cellKey: pick });
+      }
+    }
+
+    // =========================================================================
+    // 6. WEBRTC LIVE CAMERA STREAM + SECRET CODE P2P SYNC (PeerJS + BroadcastChannel)
+    // =========================================================================
+    async function toggleLocalCamera() {
+      const videoEl = document.getElementById('localVideo');
+      const fallbackEl = document.getElementById('localFallback');
+      const labelEl = document.getElementById('camBtnLabel');
+      const statusText = document.getElementById('localCamStatusText');
+
+      if (State.localStream) {
+        State.localStream.getTracks().forEach((t) => t.stop());
+        State.localStream = null;
+        videoEl.srcObject = null;
+        videoEl.classList.add('hidden');
+        fallbackEl.classList.remove('hidden');
+        labelEl.textContent = 'Start Cam';
+        statusText.textContent = 'Cam Off';
+        showToast('📷', 'Camera turned off');
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showToast('📷', 'Camera requires HTTPS (works automatically on Netlify!)');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 480 }, height: { ideal: 360 }, facingMode: 'user' },
+          audio: true
+        });
+        State.localStream = stream;
+        videoEl.srcObject = stream;
+        videoEl.classList.remove('hidden');
+        fallbackEl.classList.add('hidden');
+        labelEl.textContent = 'Cam Live';
+        showToast('📹', 'Live Camera & Mic started!');
+
+        // If already connected to partner Peer, initiate live video call immediately
+        if (State.peer && State.conn && State.conn.open) {
+          callPartnerWithVideo(State.conn.peer);
+        }
+      } catch (err) {
+        statusText.textContent = 'Preview Mode';
+        showToast('ℹ️', 'Camera permission blocked in preview — deploy on Netlify for full WebRTC video!');
+      }
+    }
+
+    function toggleMicMute() {
+      if (!State.localStream) {
+        showToast('🎙️', 'Start camera first to toggle microphone');
+        return;
+      }
+      State.micEnabled = !State.micEnabled;
+      State.localStream.getAudioTracks().forEach((t) => {
+        t.enabled = State.micEnabled;
+      });
+      document.getElementById('micBtnIcon').textContent = State.micEnabled ? '🎙️' : '🔇';
+      showToast(State.micEnabled ? '🎙️' : '🔇', State.micEnabled ? 'Microphone unmuted' : 'Microphone muted');
+    }
+
+    function attachRemoteStream(remoteStream) {
+      const remoteVid = document.getElementById('remoteVideo');
+      const remoteFallback = document.getElementById('remoteFallback');
+      if (!remoteVid) return;
+      remoteVid.srcObject = remoteStream;
+      remoteVid.classList.remove('hidden');
+      remoteFallback.classList.add('hidden');
+      showToast('💞', 'Partner live camera video connected!');
+    }
+
+    function callPartnerWithVideo(remotePeerId) {
+      if (!State.peer || !State.localStream || !remotePeerId) return;
+      try {
+        const call = State.peer.call(remotePeerId, State.localStream);
+        if (!call) return;
+        State.mediaCall = call;
+        call.on('stream', (remoteStream) => {
+          attachRemoteStream(remoteStream);
+        });
+      } catch (e) {}
+    }
+
+    function sanitizeCode(raw) {
+      return (raw || 'LUV786').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 12) || 'LUV786';
+    }
+
+    function setupBroadcastChannelFallback(code) {
+      try {
+        if (State.bc) State.bc.close();
+        if (typeof BroadcastChannel !== 'undefined') {
+          State.bc = new BroadcastChannel('ishqwords_room_' + code);
+          State.bc.onmessage = (ev) => {
+            if (ev && ev.data) handleIncomingSyncMessage(ev.data);
+          };
+        }
+      } catch (e) {}
+    }
+
+    function updateConnectionUI(statusText, isConnected) {
+      const dot = document.getElementById('connDot');
+      const badge = document.getElementById('roomCodeBadge');
+      const modalStatus = document.getElementById('modalConnStatus');
+      const partnerBadge = document.getElementById('partnerVideoBadge');
+
+      badge.textContent = `${State.roomCode} • ${isConnected ? 'LIVE' : 'WAITING'}`;
+      modalStatus.textContent = statusText;
+      partnerBadge.textContent = isConnected ? 'Partner • Connected 💞' : 'Partner • Waiting';
+
+      if (isConnected) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]';
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_#fbbf24]';
+      }
+    }
+
+    function connectCoupleRoom(role) {
+      const input = document.getElementById('secretCodeInput');
+      const code = sanitizeCode(input.value);
+      input.value = code;
+      State.roomCode = code;
+      State.role = role;
+
+      setupBroadcastChannelFallback(code);
+      updateConnectionUI(`Connecting to room ${code} as ${role.toUpperCase()}...`, false);
+
+      if (typeof Peer === 'undefined') {
+        updateConnectionUI(`Room ${code} active on local sync!`, true);
+        return;
+      }
+
+      try {
+        if (State.peer) State.peer.destroy();
+      } catch (e) {}
+
+      const hostPeerId = `ishqwords-3d-${code.toLowerCase()}-host`;
+      const myPeerId = role === 'host'
+        ? hostPeerId
+        : `ishqwords-3d-${code.toLowerCase()}-guest-${Math.floor(100 + Math.random() * 899)}`;
+
+      try {
+        const peer = new Peer(myPeerId);
+        State.peer = peer;
+
+        peer.on('open', () => {
+          if (role === 'host') {
+            updateConnectionUI(`Room "${code}" created! Ask your partner to enter "${code}" & tap Join Partner.`, false);
+            showToast('👑', `Room ${code} ready! Waiting for partner...`);
+          } else {
+            updateConnectionUI(`Joining partner room "${code}"...`, false);
+            const conn = peer.connect(hostPeerId, { reliable: true });
+            bindDataConnection(conn);
+          }
+        });
+
+        peer.on('connection', (conn) => {
+          bindDataConnection(conn);
+        });
+
+        peer.on('call', (call) => {
+          State.mediaCall = call;
+          call.answer(State.localStream || undefined);
+          call.on('stream', (remoteStream) => {
+            attachRemoteStream(remoteStream);
+          });
+        });
+
+        peer.on('error', (err) => {
+          updateConnectionUI(`Room "${code}" ready (Same-device tab sync active; check code if connecting 2 phones).`, false);
+        });
+      } catch (e) {
+        updateConnectionUI(`Room "${code}" active!`, true);
+      }
+    }
+
+    function bindDataConnection(conn) {
+      State.conn = conn;
+      conn.on('open', () => {
+        updateConnectionUI(`Connected with Partner in Room "${State.roomCode}"! 💞`, true);
+        showToast('💞', `Partner connected via Secret Code ${State.roomCode}!`);
+        document.getElementById('connectModal').classList.add('hidden');
+
+        // Sync current level state
+        sendSyncMessage({
+          type: 'HELLO_SYNC',
+          levelIndex: State.levelIndex,
+          customLevel: State.customLevel
+        });
+
+        // Start video call if camera is already active
+        if (State.localStream) {
+          callPartnerWithVideo(conn.peer);
+        }
+      });
+
+      conn.on('data', (data) => {
+        handleIncomingSyncMessage(data);
+      });
+
+      conn.on('close', () => {
+        updateConnectionUI(`Partner disconnected from ${State.roomCode}.`, false);
+        showToast('ℹ️', 'Partner disconnected');
+      });
+    }
+
+    function sendSyncMessage(payload) {
+      try {
+        if (State.conn && State.conn.open) {
+          State.conn.send(payload);
+        }
+      } catch (e) {}
+      try {
+        if (State.bc) {
+          State.bc.postMessage(payload);
+        }
+      } catch (e) {}
+    }
+
+    function handleIncomingSyncMessage(msg) {
+      if (!msg || !msg.type) return;
+      const pill = document.getElementById('partnerActivityPill');
+
+      if (msg.type === 'HELLO_SYNC') {
+        updateConnectionUI(`Connected with Partner in Room "${State.roomCode}"! 💞`, true);
+      } else if (msg.type === 'PARTNER_SWIPING') {
+        if (pill) {
+          pill.textContent = `Swiping ${msg.preview || ''}...`;
+          pill.classList.remove('hidden');
+          clearTimeout(pill._t);
+          pill._t = setTimeout(() => pill.classList.add('hidden'), 1100);
+        }
+      } else if (msg.type === 'WORD_SOLVED') {
+        submitCandidateWord(msg.word, 'partner', false);
+      } else if (msg.type === 'BONUS_WORD') {
+        submitCandidateWord(msg.word, 'partner', false);
+      } else if (msg.type === 'HINT_CELL') {
+        State.revealedCells[msg.cellKey] = true;
+        renderCrosswordGrid();
+        showToast('💡', 'Partner revealed a hint on the board!');
+      } else if (msg.type === 'REACTION') {
+        spawnFloatingReaction(msg.emoji, msg.note || 'From Partner 💞');
+      } else if (msg.type === 'LOAD_LEVEL') {
+        loadLevel(msg.levelIndex || 0, msg.customLevel || null, false);
+        showToast('🌸', 'Partner switched to a new romantic level!');
+      }
+    }
+
+    // =========================================================================
+    // 7. DEMO AI PARTNER CO-OP BOT (For Instant Solo Testing in Canvas)
+    // =========================================================================
+    function toggleDemoPartnerBot() {
+      State.demoBotActive = !State.demoBotActive;
+      const label = document.getElementById('demoPartnerLabel');
+      label.textContent = State.demoBotActive ? '🤖 Co-Op Bot: ON' : '🤖 Co-Op Bot: Off';
+      updateConnectionUI(
+        State.demoBotActive ? `AI Partner Co-Op Active (${State.roomCode})` : `Room ${State.roomCode}`,
+        State.demoBotActive
+      );
+
+      clearInterval(State.demoBotTimer);
+      if (State.demoBotActive) {
+        showToast('🤖', 'AI Partner joined! They will help solve words & send love reactions.');
+        State.demoBotTimer = setInterval(() => {
+          if (!State.demoBotActive) return;
+          const lv = getActiveLevel();
+          const unsolved = lv.words.filter((w) => !State.solvedWords[w.word]);
+          if (unsolved.length === 0) return;
+
+          // Simulate partner swiping indicator then solving or reacting
+          const pick = unsolved[Math.floor(Math.random() * unsolved.length)];
+          handleIncomingSyncMessage({ type: 'PARTNER_SWIPING', preview: pick.word.slice(0, 2) });
+
+          setTimeout(() => {
+            if (!State.demoBotActive) return;
+            if (Math.random() < 0.68) {
+              submitCandidateWord(pick.word, 'partner', false);
+            } else {
+              const emojis = ['❤️', '😘', '🔥', '🥰'];
+              const notes = ['Miss you! ❤️', 'Great word! ✨', 'So proud of us 💞', 'Your turn jaan! 🌸'];
+              spawnFloatingReaction(
+                emojis[Math.floor(Math.random() * emojis.length)],
+                notes[Math.floor(Math.random() * notes.length)]
+              );
+            }
+          }, 1400);
+        }, 6500);
+      } else {
+        showToast('ℹ️', 'AI Partner Co-Op paused');
+      }
+    }
+
+    // =========================================================================
+    // 8. CUSTOM COUPLE PUZZLE GENERATOR
+    // =========================================================================
+    function createCustomCouplePuzzle() {
+      const rawWord = (document.getElementById('customMainWord').value || '').replace(/[^a-zA-Z]/g, '').toUpperCase();
+      const rawNote = (document.getElementById('customLoveNote').value || '').trim();
+
+      if (rawWord.length < 4 || rawWord.length > 6) {
+        showToast('💌', 'Please enter a 4 to 6 letter word (e.g. LAHORE or JAANUM)');
+        return;
+      }
+
+      const letters = rawWord.split('');
+      while (letters.length < 6) {
+        const extras = ['E', 'A', 'R', 'S', 'O', 'L'];
+        letters.push(extras[letters.length % extras.length]);
+      }
+
+      // Build intersecting sub-words from the chosen word's letters
+      const w1 = rawWord;
+      const w2 = rawWord.slice(0, 4);
+      const w3 = rawWord[rawWord.length - 1] + rawWord.slice(1, 4);
+
+      const customLv = {
+        id: 99,
+        title: `Custom • ${w1}`,
+        subtitle: 'Personal Couple Memory',
+        theme: 'sakura',
+        note: rawNote || `A special puzzle crafted around "${w1}" just for the two of us.`,
+        letters: letters,
+        words: [
+          { word: w1, row: 1, col: 0, dir: 'H' },
+          { word: w2, row: 1, col: 0, dir: 'V' },
+          { word: w3, row: 0, col: w1.length - 1, dir: 'V' }
+        ],
+        bonus: [rawWord.slice(0, 3), rawWord.split('').reverse().join('').slice(0, 3)]
+      };
+
+      document.getElementById('customWordModal').classList.add('hidden');
+      loadLevel(0, customLv, true);
+      spawnFloatingReaction('💌', `Custom Puzzle: ${w1}`);
+    }
+
+    // =========================================================================
+    // 9. UI WIRING & INITIALIZATION
+    // =========================================================================
+    function populateLevelModal() {
+      const container = document.getElementById('levelListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      LEVELS.forEach((lv, idx) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'ios-pill-btn p-3 rounded-2xl text-left flex flex-col justify-between gap-1';
+        card.innerHTML = `
+          <div class="text-[10px] font-bold uppercase text-amber-300">Level ${lv.id} • ${lv.letters.join('')}</div>
+          <div class="text-xs font-extrabold text-white truncate">${lv.title}</div>
+          <div class="text-[10px] text-pink-200/80 truncate">${lv.subtitle}</div>
+        `;
+        card.addEventListener('click', () => {
+          document.getElementById('levelModal').classList.add('hidden');
+          loadLevel(idx, null, true);
+        });
+        container.appendChild(card);
+      });
+    }
+
+    function copySecretCodeToClipboard() {
+      const input = document.getElementById('secretCodeInput');
+      const code = sanitizeCode(input.value);
+      input.value = code;
+      const shareText = `Join my Couple Wordscapes 3D room! Secret Code: ${code}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast('📋', `Secret Code "${code}" copied!`);
+        }).catch(() => {
+          fallbackCopy(shareText, code);
+        });
+      } else {
+        fallbackCopy(shareText, code);
+      }
+    }
+
+    function fallbackCopy(text, code) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = code;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast('📋', `Secret Code "${code}" copied!`);
+      } catch (e) {
+        showToast('📋', `Code: ${code}`);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      Scene3D.init();
+      populateLevelModal();
+      setupWheelInteraction();
+      loadLevel(0, null, false);
+      setupBroadcastChannelFallback(State.roomCode);
+
+      // Top bar & modal triggers
+      document.getElementById('btnOpenConnectModal').addEventListener('click', () => {
+        document.getElementById('connectModal').classList.remove('hidden');
+      });
+      document.getElementById('btnCloseConnectModal').addEventListener('click', () => {
+        document.getElementById('connectModal').classList.add('hidden');
+      });
+      document.getElementById('btnStartSoloOrDemo').addEventListener('click', () => {
+        document.getElementById('connectModal').classList.add('hidden');
+        if (!State.demoBotActive) toggleDemoPartnerBot();
+      });
+
+      document.getElementById('btnRandomCode').addEventListener('click', () => {
+        const prefixes = ['LUV', 'DIL', 'JAN', 'ISHQ', 'PYR'];
+        const p = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const num = Math.floor(100 + Math.random() * 900);
+        const code = `${p}${num}`;
+        document.getElementById('secretCodeInput').value = code;
+        showToast('🎲', `Generated new code: ${code}`);
+      });
+
+      document.getElementById('btnCopyCode').addEventListener('click', copySecretCodeToClipboard);
+      document.getElementById('btnHostRoom').addEventListener('click', () => connectCoupleRoom('host'));
+      document.getElementById('btnJoinRoom').addEventListener('click', () => connectCoupleRoom('guest'));
+
+      // Level selector
+      document.getElementById('btnLevelPicker').addEventListener('click', () => {
+        document.getElementById('levelModal').classList.remove('hidden');
+      });
+      document.getElementById('btnCloseLevelModal').addEventListener('click', () => {
+        document.getElementById('levelModal').classList.add('hidden');
+      });
+
+      // Custom Couple Level modal
+      document.getElementById('btnCustomWordModal').addEventListener('click', () => {
+        document.getElementById('customWordModal').classList.remove('hidden');
+      });
+      document.getElementById('btnCloseCustomModal').addEventListener('click', () => {
+        document.getElementById('customWordModal').classList.add('hidden');
+      });
+      document.getElementById('btnCreateCustomLevel').addEventListener('click', createCustomCouplePuzzle);
+
+      // Netlify modal
+      document.getElementById('btnNetlifyGuide').addEventListener('click', () => {
+        document.getElementById('netlifyModal').classList.remove('hidden');
+      });
+      document.getElementById('btnCloseNetlifyModal').addEventListener('click', () => {
+        document.getElementById('netlifyModal').classList.add('hidden');
+      });
+
+      // Sound toggle
+      document.getElementById('btnSoundToggle').addEventListener('click', () => {
+        SoundFX.muted = !SoundFX.muted;
+        document.getElementById('soundIcon').textContent = SoundFX.muted ? '🔇' : '🔊';
+        showToast(SoundFX.muted ? '🔇' : '🔊', SoundFX.muted ? 'Sound Muted' : 'Sound Effects Active');
+      });
+
+      // Camera & Mic controls
+      document.getElementById('btnToggleCam').addEventListener('click', toggleLocalCamera);
+      document.getElementById('btnToggleMic').addEventListener('click', toggleMicMute);
+      document.getElementById('btnDemoPartner').addEventListener('click', toggleDemoPartnerBot);
+
+      // Wheel Controls (Shuffle, Hint, Center Go)
+      document.getElementById('btnShuffleWheel').addEventListener('click', () => {
+        for (let i = State.wheelOrder.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = State.wheelOrder[i];
+          State.wheelOrder[i] = State.wheelOrder[j];
+          State.wheelOrder[j] = tmp;
+        }
+        SoundFX.playSelect(2);
+        renderWheel();
+      });
+
+      document.getElementById('btnHint').addEventListener('click', () => triggerHint(true));
+
+      document.getElementById('btnSubmitWord').addEventListener('click', () => {
+        const typed = document.getElementById('chatInput').value.trim();
+        if (typed) {
+          submitCandidateWord(typed, 'self', true);
+          document.getElementById('chatInput').value = '';
+        } else {
+          showToast('💖', 'Drag across letters on the wheel or type a word below!');
+        }
+      });
+
+      // Reactions
+      document.querySelectorAll('.reaction-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const emoji = btn.dataset.reaction || '❤️';
+          spawnFloatingReaction(emoji, 'Sent to Partner 💞');
+          sendSyncMessage({ type: 'REACTION', emoji, note: 'Love from Partner 💞' });
+        });
+      });
+
+      // Chat / Word Input
+      function handleChatOrWordSend() {
+        const input = document.getElementById('chatInput');
+        const val = (input.value || '').trim();
+        if (!val) return;
+        input.value = '';
+        const lv = getActiveLevel();
+        const upper = val.toUpperCase();
+        const isGridWord = lv.words.some((w) => w.word === upper) || (lv.bonus && lv.bonus.includes(upper));
+        if (isGridWord) {
+          submitCandidateWord(upper, 'self', true);
+        } else {
+          spawnFloatingReaction('💌', val);
+          sendSyncMessage({ type: 'REACTION', emoji: '💌', note: val });
+        }
+      }
+
+      document.getElementById('btnSendChat').addEventListener('click', handleChatOrWordSend);
+      document.getElementById('chatInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleChatOrWordSend();
+      });
+
+      // Next Level button in Win Modal
+      document.getElementById('btnNextLevel').addEventListener('click', () => {
+        loadLevel(State.levelIndex + 1, null, true);
+      });
+    });
+  </script>
+</body>
+</html>
