@@ -230,7 +230,25 @@
 
       <button id="btnLevelPicker" type="button" class="ios-pill-btn px-3 py-1.5 rounded-2xl text-left">
         <div class="text-[10px] uppercase tracking-wider text-amber-200 font-bold leading-none" id="levelCounterLabel">LEVEL 1 / 8</div>
-        <div class="text-xs sm:text-sm font-bold text-white truncate max-w-[130px] sm:max-w-[190px]" id="levelTitleLabel">Pehli Nazar</div>
+        <div class="text-xs sm:text-sm font-bold text-white truncate max-w-[120px] sm:max-w-[175px]" id="levelTitleLabel">Pehli Nazar</div>
+      </button>
+
+      <!-- Difficulty Pills (Easy <=5, Normal 6-7, Hard 8-10) + Fresh Randomize Button -->
+      <div class="ios-glass p-1 rounded-2xl flex items-center gap-1" role="group" aria-label="Difficulty Selection">
+        <button id="btnDiffEasy" type="button" data-diff="easy" class="diff-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold transition text-pink-100/80 hover:text-white" title="Easy: Max 5 Letters">
+          Easy (≤5)
+        </button>
+        <button id="btnDiffNormal" type="button" data-diff="normal" class="diff-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold transition bg-gradient-to-r from-pink-500 to-amber-400 text-white shadow" title="Normal: 6 to 7 Letters">
+          Normal (6–7)
+        </button>
+        <button id="btnDiffHard" type="button" data-diff="hard" class="diff-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold transition text-pink-100/80 hover:text-white" title="Hard: 8 to 10 Letters">
+          Hard (8–10)
+        </button>
+      </div>
+
+      <button id="btnNewRandomBoard" type="button" class="ios-pill-btn px-2.5 py-1.5 rounded-2xl text-xs font-extrabold text-amber-200 flex items-center gap-1" title="Generate Fresh Random Puzzle">
+        <span>🎲</span>
+        <span class="hidden md:inline">New Board</span>
       </button>
     </div>
 
@@ -441,7 +459,7 @@
           <button id="btnCopyCode" type="button" class="ios-pill-btn px-3 py-2.5 rounded-xl text-xs font-bold text-amber-200" title="Copy Secret Code">📋 Copy</button>
         </div>
         <p class="text-[11px] text-pink-100/75 mt-2 leading-relaxed">
-          Dono partners apne phone par game open kar ke same <strong>Secret Code</strong> dalein: ek partner <strong>Host Room</strong> dabayega aur dusra <strong>Join Partner</strong>.
+          Both partners open the game on their phones and enter the same <strong>Secret Code</strong>: Partner 1 taps <strong>Host Room</strong> and Partner 2 taps <strong>Join Partner</strong>.
         </p>
       </div>
 
@@ -480,24 +498,38 @@
     </div>
   </div>
 
-  <!-- MODAL 3: CUSTOM COUPLE PUZZLE CREATOR -->
+  <!-- MODAL 3: CUSTOM COUPLE WORD CIRCLE CREATOR -->
   <div id="customWordModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
     <div class="ios-glass-dark w-full max-w-md rounded-3xl p-5 border border-white/25 shadow-2xl">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-display text-lg font-extrabold text-white">💌 Create Custom Couple Level</h2>
+      <div class="flex items-center justify-between mb-2.5">
+        <h2 class="font-display text-lg font-extrabold text-white">💌 Custom Word Circle Builder</h2>
         <button id="btnCloseCustomModal" type="button" class="ios-pill-btn w-8 h-8 rounded-full flex items-center justify-center text-xs">✕</button>
       </div>
       <p class="text-xs text-pink-200/80 mb-3">
-        Surprise your partner with a custom 4 to 6 letter word (like your nickname, favorite city, or special memory) and a romantic love note!
+        Design your own <strong>4 to 10 letter</strong> English Custom Word Circle! Type your letters below to preview the wheel live and auto-find valid English words.
       </p>
-      <div class="space-y-2.5 mb-4">
+      <div class="space-y-2.5 mb-3">
         <div>
-          <label for="customMainWord" class="block text-[11px] font-bold text-amber-200 uppercase mb-1">Main Secret Word (4–6 Letters)</label>
-          <input id="customMainWord" type="text" maxlength="6" placeholder="e.g. LAHORE or JAANUM" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-sm font-bold uppercase select-text" />
+          <label for="customMainWord" class="block text-[11px] font-bold text-amber-200 uppercase mb-1">Circle Letters / Main Word (4–10 Letters)</label>
+          <input id="customMainWord" type="text" maxlength="10" placeholder="e.g. SOULMATES, ROMANCE, HEART" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-sm font-bold uppercase tracking-widest select-text" />
+        </div>
+        <div>
+          <label for="customExtraWords" class="block text-[11px] font-bold text-emerald-200 uppercase mb-1">Custom Grid Words (Optional, comma separated)</label>
+          <input id="customExtraWords" type="text" maxlength="90" placeholder="e.g. SOUL, MATE, LATE, TALE, LOTUS (or leave blank)" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-xs uppercase select-text" />
         </div>
         <div>
           <label for="customLoveNote" class="block text-[11px] font-bold text-pink-200 uppercase mb-1">Love Note Clue</label>
-          <input id="customLoveNote" type="text" maxlength="80" placeholder="e.g. Where we had our favorite chai together ☕❤️" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-xs select-text" />
+          <input id="customLoveNote" type="text" maxlength="80" placeholder="e.g. Every moment with you feels like magic ✨❤️" class="w-full bg-white/10 text-white px-3 py-2 rounded-xl border border-white/20 text-xs select-text" />
+        </div>
+        <!-- Live Circle Preview Pills -->
+        <div class="bg-slate-950/60 rounded-2xl p-2.5 border border-white/10 flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase text-pink-200">Wheel Preview:</span>
+          <div id="customCirclePreview" class="flex items-center gap-1 flex-wrap justify-end">
+            <span class="px-2 py-0.5 rounded-full bg-pink-500/30 border border-pink-300/40 text-xs font-extrabold">L</span>
+            <span class="px-2 py-0.5 rounded-full bg-pink-500/30 border border-pink-300/40 text-xs font-extrabold">O</span>
+            <span class="px-2 py-0.5 rounded-full bg-pink-500/30 border border-pink-300/40 text-xs font-extrabold">V</span>
+            <span class="px-2 py-0.5 rounded-full bg-pink-500/30 border border-pink-300/40 text-xs font-extrabold">E</span>
+          </div>
         </div>
       </div>
       <button id="btnCreateCustomLevel" type="button" class="w-full ios-primary-btn py-2.5 rounded-2xl font-bold text-sm text-white">
@@ -1297,7 +1329,358 @@
     // =========================================================================
     // 4. GAME STATE, CROSSWORD ENGINE & REAL-TIME COUPLE SYNC (PeerJS + Local)
     // =========================================================================
+    // =========================================================================
+    // 3B. 100% PURE ENGLISH WORD ENGINE (Easy <=5, Normal 6-7, Hard 8-10)
+    //     Mostly Romantic English Words + Fun Everyday English Words
+    //     Procedurally builds a brand-new crossword & wheel every single time!
+    // =========================================================================
+    const MASTER_ENGLISH_WORDS = [
+      // 3-letter pure English words
+      "ACT","ADD","AGE","AGO","AID","AIM","AIR","ALL","AND","ANT","ANY","APE","ARC","ARE","ARK","ARM","ART","ASH","ASK","ATE",
+      "AWE","BAD","BAG","BAN","BAR","BAT","BAY","BED","BEE","BEG","BET","BID","BIG","BIN","BIT","BOW","BOX","BOY","BUD","BUG",
+      "BUN","BUS","BUT","BUY","CAB","CAN","CAP","CAR","CAT","COB","COD","COG","COP","COT","COW","CRY","CUB","CUP","CUT","DAD",
+      "DAM","DAY","DEN","DEW","DID","DIE","DIG","DIM","DIN","DIP","DOG","DOT","DRY","DUE","DUG","EAR","EAT","EEL","EGG","ELM",
+      "END","ERA","EVE","EWE","EYE","FAN","FAR","FAT","FED","FEE","FEW","FIG","FIN","FIR","FIT","FIX","FLY","FOE","FOG","FOR",
+      "FOX","FRY","FUN","FUR","GAP","GAS","GEL","GEM","GET","GOD","GOT","GUM","GUN","GUT","GUY","GYM","HAD","HAM","HAS","HAT",
+      "HAY","HEN","HER","HEW","HID","HIM","HIP","HIS","HIT","HOG","HOP","HOT","HOW","HUB","HUE","HUG","HUM","HUT","ICE","ICY",
+      "ILL","INK","INN","ION","IRE","IVY","JAB","JAM","JAR","JAW","JAY","JET","JIG","JOB","JOG","JOY","JUG","KEY","KID","KIN",
+      "KIT","LAB","LAD","LAG","LAP","LAW","LAY","LEA","LED","LEG","LET","LID","LIE","LIP","LIT","LOG","LOT","LOW","MAD","MAN",
+      "MAP","MAR","MAT","MAY","MEN","MET","MID","MIX","MOB","MOM","MOP","MUD","MUG","NAP","NET","NEW","NIL","NOD","NOR","NOT",
+      "NOW","NUN","NUT","OAK","OAR","OAT","ODD","ODE","OFF","OFT","OIL","OLD","ONE","OPT","ORB","ORE","OUR","OUT","OWE","OWL",
+      "OWN","PAD","PAL","PAN","PAR","PAT","PAW","PAY","PEA","PEG","PEN","PEP","PER","PET","PIE","PIG","PIN","PIT","PLY","POD",
+      "POP","POT","PRO","PRY","PUB","PUN","PUP","PUT","RAG","RAM","RAN","RAP","RAT","RAW","RAY","RED","RIB","RID","RIG","RIM",
+      "RIP","ROB","ROD","ROE","ROT","ROW","RUB","RUG","RUN","RUT","RYE","SAD","SAG","SAP","SAT","SAW","SAY","SEA","SEE","SET",
+      "SEW","SHE","SHY","SIN","SIP","SIR","SIS","SIT","SIX","SKI","SKY","SLY","SOB","SOD","SON","SOP","SOT","SOW","SOY","SPA",
+      "SPY","SUB","SUE","SUM","SUN","SUP","TAB","TAG","TAN","TAP","TAR","TAX","TEA","TEN","THE","TIE","TIN","TIP","TOE","TON",
+      "TOO","TOP","TOT","TOW","TOY","TRY","TUB","TUG","TWO","URN","USE","VAN","VAT","VET","VEX","VIA","VIE","VOW","WAD","WAG",
+      "WAR","WAS","WAX","WAY","WEB","WED","WET","WHO","WHY","WIG","WIN","WIT","WOE","WOK","WON","WOO","WOW","YAM","YAP","YAW",
+      "YEA","YES","YET","YEW","YOU","ZAP","ZEN","ZIP","ZOO",
+      // 4-letter Romantic & Common English words
+      "ABLE","ACHE","ACID","ACRE","AGED","AIDE","AIRY","ALLY","ALSO","ALTO","AMID","ANEW","ARCH","AREA","ARID","ARMY","ARTS",
+      "AUNT","AURA","AUTO","AVID","AWAY","BABY","BACK","BAIL","BAIT","BAKE","BALD","BALE","BALL","BALM","BAND","BANE","BANG",
+      "BANK","BARE","BARK","BARN","BASE","BASH","BASK","BATH","BEAD","BEAK","BEAM","BEAN","BEAR","BEAT","BEAU","BECK","BEEF",
+      "BEEN","BEEP","BEER","BEET","BELL","BELT","BEND","BENT","BERG","BEST","BETA","BIAS","BIDE","BIKE","BILE","BILL","BIND",
+      "BIRD","BITE","BLOW","BLUE","BLUR","BOAR","BOAT","BODE","BODY","BOIL","BOLD","BOLT","BOND","BONE","BOOK","BOOM","BOON",
+      "BOOT","BORE","BORN","BOSS","BOTH","BOUT","BOWL","BRAG","BRAN","BRED","BREW","BRIM","BROW","BUCK","BULB","BULK","BULL",
+      "BUMP","BURN","CAFE","CAGE","CAKE","CALF","CALL","CALM","CAME","CAMP","CANE","CAPE","CARD","CARE","CARP","CART","CASE",
+      "CASH","CAST","CAVE","CELL","CHAT","CHEF","CHIN","CHIP","CHOP","CITY","CLAD","CLAM","CLAN","CLAP","CLAW","CLAY","CLIP",
+      "CLUB","CLUE","COAL","COAT","CODE","COIL","COIN","COLD","COLE","COLT","COMB","COME","CONE","COOK","COOL","COPE","COPY",
+      "CORD","CORE","CORK","CORN","COST","COZY","CRAB","CRAG","CRAM","CREW","CRIB","CROP","CROW","CUBE","CUFF","CULL","CULT",
+      "CURB","CURE","CURL","CUTE","DAME","DAMP","DARE","DARK","DARN","DART","DASH","DATA","DATE","DAWN","DAYS","DAZE","DEAD",
+      "DEAF","DEAL","DEAN","DEAR","DEBT","DECK","DEED","DEEM","DEEP","DEER","DEFY","DELI","DEMO","DENT","DENY","DESK","DIAL",
+      "DICE","DIET","DIME","DINE","DIRE","DIRT","DISC","DISH","DISK","DIVE","DOCK","DOER","DOES","DOLL","DOME","DONE","DOOM",
+      "DOOR","DOSE","DOTE","DOVE","DOWN","DOZE","DRAB","DRAG","DRAW","DREW","DRIP","DROP","DRUM","DUAL","DUCK","DUEL","DUET",
+      "DUKE","DULL","DUNE","DUSK","DUST","DUTY","EACH","EARL","EARN","EARS","EASE","EAST","EASY","EATS","ECHO","EDGE","EDIT",
+      "ELSE","EMIT","ENVY","EPIC","ERAS","EVEN","EVER","EVIL","EXAM","EXIT","EYED","EYES","FACE","FACT","FADE","FAIL","FAIR",
+      "FAKE","FALL","FAME","FANG","FARE","FARM","FAST","FATE","FAWN","FEAR","FEAT","FEED","FEEL","FEET","FELL","FELT","FEND",
+      "FERN","FEST","FEUD","FILE","FILL","FILM","FIND","FINE","FIRE","FIRM","FISH","FIST","FIVE","FLAG","FLAK","FLAP","FLAT",
+      "FLAW","FLEA","FLED","FLEE","FLEW","FLEX","FLIP","FLIT","FLOE","FLOP","FLOW","FOAM","FOIL","FOLD","FOLK","FOND","FONT",
+      "FOOD","FOOL","FOOT","FORD","FORE","FORK","FORM","FORT","FOUL","FOUR","FOWL","FREE","FRET","FROG","FROM","FUEL","FULL",
+      "FUME","FUND","FURY","FUSE","FUSS","GAIN","GALA","GALE","GALL","GAME","GANG","GARB","GASP","GATE","GAVE","GAZE","GEAR",
+      "GENE","GERM","GIFT","GILD","GILL","GILT","GIRL","GIST","GIVE","GLAD","GLEE","GLEN","GLIB","GLOB","GLOW","GLUE","GLUM",
+      "GNAT","GNAW","GOAL","GOAT","GOES","GOLD","GOLF","GONE","GOOD","GORE","GOWN","GRAB","GRAM","GRAY","GREW","GREY","GRID",
+      "GRIM","GRIN","GRIP","GRIT","GROW","GULF","GULL","GULP","GURU","GUSH","GUST","HACK","HAIL","HAIR","HALE","HALF","HALL",
+      "HALT","HAND","HANG","HARD","HARE","HARM","HARP","HART","HASH","HATE","HATH","HAUL","HAVE","HAWK","HAZE","HAZY","HEAD",
+      "HEAL","HEAP","HEAR","HEAT","HEED","HEEL","USSR","HEIR","HELD","HELL","HELM","HELP","HEMP","HERB","HERD","HERE","HERO",
+      "HERS","HIDE","HIGH","HIKE","HILL","HILT","HIND","HINT","HIRE","HISS","HITS","HIVE","HOAX","HOLD","HOLE","HOLY","HOME",
+      "HONE","HOOD","HOOF","HOOK","HOOP","HOOT","HOPE","HORN","HOSE","HOST","HOUR","HOWL","HUGE","HULK","HULL","HUMP","HUNG",
+      "HUNT","HURL","HURT","HUSH","HYMN","ICON","IDEA","IDLE","IDOL","INCH","INTO","IONS","IRIS","IRON","ISLE","ITEM","ITSY",
+      "JADE","JAIL","JAZZ","JEAN","JEEP","JEER","JEST","JILT","JINX","JOIN","JOKE","JOLT","JUMP","JUNE","JURY","JUST","KEEN",
+      "KEEP","KELP","KEPT","KICK","KIDS","KIND","KING","KISS","KITE","KNEE","KNEW","KNIT","KNOB","KNOT","KNOW","LACE","LACK",
+      "LADY","LAID","LAIR","LAKE","LAMB","LAME","LAMP","LAND","LANE","LARK","LASH","LASS","LAST","LATE","LAUD","LAVA","LAWN",
+      "LAZY","LEAD","LEAF","LEAK","LEAN","LEAP","LEFT","LEND","LENS","LENT","LESS","LEST","LEVY","LIAR","LICE","LICK","LIED",
+      "LIEN","LIES","LIFE","LIFT","LIKE","LILY","LIMB","LIME","LIMP","LINE","LINK","LINT","LION","LIPS","LIST","LIVE","LOAD",
+      "LOAF","LOAM","LOAN","LOBE","LOCK","LOFT","LOGO","LONE","LONG","LOOK","LOOM","LOOP","LOOT","LORD","LORE","LOSE","LOSS",
+      "LOST","LOTS","LOUD","LOVE","LOWS","LUCK","LULL","LUMP","LUNG","LURE","LURK","LUSH","LUST","LUTE","LYRE","MADE","MAID",
+      "MAIL","MAIN","MAKE","MALE","MALL","MALT","MANE","MANY","MARE","MARK","MARS","MART","MASH","MASK","MASS","MAST","MATE",
+      "MATH","MAZE","MEAD","MEAL","MEAN","MEAT","MEEK","MEET","MELD","MELT","MEMO","MEND","MENU","MERE","MESH","MESS","MICE",
+      "MILD","MILE","MILK","MILL","MIME","MIND","MINE","MINT","MIRE","MISS","MIST","MITE","MITT","MOAN","MOAT","MOCK","MODE",
+      "MOLD","MOLE","MOLT","MONK","MOOD","MOON","MOOR","MOOT","MORE","MORN","MOSS","MOST","MOTH","MOVE","MUCH","MUCK","MULE",
+      "MULL","MUSE","MUSH","MUSK","MUST","MUTE","MYTH","NAIL","NAME","NAPE","NAVY","NEAR","NEAT","NECK","NEED","NEST","NEWS",
+      "NEXT","NICE","NICK","NINE","NODE","NONE","NOOK","NOON","NORM","NOSE","NOTE","NOUN","NOVA","NUDE","NUMB","OAKS","OARS",
+      "OATH","OATS","OBEY","ODDS","ODOR","OKAY","OMEN","OMIT","ONCE","ONLY","ONTO","OOZE","OPAL","OPEN","ORAL","ORBS","ORES",
+      "OURS","OUST","OUTS","OVAL","OVEN","OVER","OWED","OWES","OWLS","OWNS","PACE","PACK","PACT","PAGE","PAID","PAIL","PAIN",
+      "PAIR","PALE","PALM","PANE","PANG","PANS","PANT","PARA","PARE","PARK","PART","PASS","PAST","PATH","PATS","PAVE","PAWN",
+      "PAWS","PEAK","PEAL","PEAR","PEAS","PEAT","PECK","PEEK","PEEL","PEER","PELT","PENS","PENT","PERK","PERM","PEST","PETS",
+      "PICK","PIER","PIES","PIKE","PILE","PILL","PINE","PING","PINK","PINS","PINT","PIPE","PITH","PITY","PLAN","PLAY","PLEA",
+      "PLOD","PLOT","PLOW","PLOY","PLUG","PLUM","PLUS","POEM","POET","POKE","POLE","POLL","POLO","POMP","POND","PONY","POOL",
+      "POOR","POPE","PORE","PORK","PORT","POSE","POSH","POST","POTS","POUR","POUT","PRAY","PREP","PREY","PRIM","PROD","PROM",
+      "PROP","PROS","PROW","PULL","PULP","PUMP","PURE","PURR","PUSH","PUTT","QUIT","QUIZ","RACE","RACK","RAFT","RAGE","RAGS",
+      "RAID","RAIL","RAIN","RAKE","RAMP","RANG","RANK","RANT","RARE","RASH","RASP","RATE","RATS","RAVE","RAYS","RAZE","READ",
+      "REAL","REAM","REAP","REAR","REDO","REED","REEF","REEK","REEL","REIN","RELY","REND","RENT","REST","RICE","RICH","RIDE",
+      "RIFE","RIFT","RIGS","RILE","RIME","RIMS","RIND","RING","RINK","RIOT","RIPE","RISE","RISK","RITE","ROAD","ROAM","ROAR",
+      "ROBE","ROCK","RODE","RODS","ROLE","ROLL","ROMP","ROOF","ROOK","ROOM","ROOT","ROPE","ROSE","ROSY","ROTE","ROTS","ROUT",
+      "ROVE","ROWS","RUDE","RUIN","RULE","RUMP","RUNE","RUNG","RUNS","RUNT","RUSE","RUSH","RUST","SACK","SAFE","SAGA","SAGE",
+      "SAID","SAIL","SAKE","SALE","SALT","SAME","SAND","SANE","SANG","SANK","SAPS","SASH","SATE","SAVE","SAWS","SAYS","SCAB",
+      "SCAM","SCAN","SCAR","SEAL","SEAM","SEAR","SEAS","SEAT","SECT","SEED","SEEK","SEEM","SEEN","SEEP","SEER","SELF","SELL",
+      "SEMI","SEND","SENT","SETS","SEWN","SHAD","SHAG","SHAM","SHED","SHIN","SHIP","SHOD","SHOE","SHOO","SHOP","SHOT","SHOW",
+      "SHUN","SHUT","SICK","SIDE","SIFT","SIGH","SIGN","SILK","SILL","SILO","SILT","SING","SINK","SINS","SIPS","SIRE","SITE",
+      "SITS","SIZE","SKEW","SKID","SKIM","SKIN","SKIP","SKIT","SLAB","SLAG","SLAM","SLAP","SLAT","SLAW","SLAY","SLED","SLEW",
+      "SLID","SLIM","SLIP","SLIT","SLOB","SLOE","SLOG","SLOP","SLOT","SLOW","SLUG","SLUM","SLUR","SMOG","SMUG","SNAG","SNAP",
+      "SNIP","SNOB","SNOW","SNUB","SNUG","SOAK","SOAP","SOAR","SOCK","SODA","SOFA","SOFT","SOIL","SOLD","SOLE","SOLO","SOME",
+      "SONG","SONS","SOON","SOOT","SORE","SORT","SOUL","SOUP","SOUR","SOWN","SPAM","SPAN","SPAR","SPAS","SPAT","SPEC","SPED",
+      "SPIN","SPIT","SPOT","SPRY","SPUD","SPUN","SPUR","STAB","STAG","STAR","STAT","STAY","STEM","STEP","STEW","STIR","STOP",
+      "STOW","STUB","STUD","STUN","SUCH","SUDS","SUIT","SULK","SUMO","SUMS","SUNG","SUNK","SUNS","SURE","SURF","SWAB","SWAG",
+      "SWAM","SWAN","SWAP","SWAT","SWAY","SWIM","SWUM","SYNC","TABS","TACK","TACO","TACT","TAGS","TAIL","TAKE","TALE","TALK",
+      "TALL","TAME","TANG","TANK","TANS","TAPE","TAPS","TARE","TARN","TARP","TART","TASK","TAUT","TAXI","TEAM","TEAR","TEAS",
+      "TEEM","TEEN","TEES","TELL","TEMP","TEND","TENS","TENT","TERM","TERN","TEST","TEXT","THAN","THAT","THAW","THEE","THEM",
+      "THEN","THEY","THIN","THIS","THOU","THUD","THUG","THUS","TICK","TIDE","TIDY","TIED","TIER","TIES","TILE","TILL","TILT",
+      "TIME","TINE","TING","TINS","TINT","TINY","TIPS","TIRE","TOAD","TOES","TOFU","TOGA","TOIL","TOLD","TOLL","TOMB","TOME",
+      "TONE","TONG","TONS","TOOK","TOOL","TOOT","TOPS","TORE","TORN","TORT","TOSS","TOTE","TOUR","TOUT","TOWN","TOYS","TRAM",
+      "TRAP","TRAY","TREE","TREK","TRIM","TRIO","TRIP","TROD","TROT","TRUE","TUBA","TUBE","TUCK","TUFT","TUNA","TUNE","TURF",
+      "TURN","TUSK","TUTU","TWIG","TWIN","TWIT","TYPE","TYPO","UNDO","UNIT","UNTO","UPON","URGE","USED","USER","USES","VAIN",
+      "VALE","VANE","VARY","VASE","VAST","VEAL","VEER","VEIL","VEIN","VEND","VENT","VERB","VERY","VEST","VETO","VIAL","VIBE",
+      "VICE","VIED","VIEW","VILE","VINE","VISA","VISE","VOID","VOLT","VOTE","VOWS","WADE","WAGE","WAIF","WAIL","WAIT","WAKE",
+      "WALK","WALL","WAND","WANE","WANT","WARD","WARE","WARM","WARN","WARP","WARS","WART","WARY","WASH","WASP","WAVE","WAVY",
+      "WAXY","WAYS","WEAK","WEAN","WEAR","WEED","WEEK","WEEP","WEFT","WEIR","WELD","WELL","WELT","WENT","WEPT","WERE","WEST",
+      "WETS","WHAM","WHAT","WHEE","WHEN","WHET","WHEY","WHIM","WHIP","WHIR","WHIT","WHIZ","WHOM","WIDE","WIFE","WILD","WILE",
+      "WILL","WILT","WILY","WIMP","WIND","WINE","WING","WINK","WINS","WIPE","WIRE","WIRY","WISE","WISH","WISP","WITH","WITS",
+      "WOKE","WOLF","WOMB","WONT","WOOD","WOOL","WORD","WORE","WORK","WORM","WORN","WOVE","WRAP","WREN","WRIT","YARD","YARN",
+      "YAWN","YEAR","YELL","YELP","YOGA","YOKE","YOLK","YORE","YOUR","ZEAL","ZERO","ZEST","ZINC","ZONE","ZOOM",
+      // 5-to-10 letter Romantic & Fun English words
+      "ADORE","ADORES","ANGEL","ANGELS","AMOUR","BLISS","BLOOM","BLOOMS","BLUSH","BRIDE","BRIDES","CHARM","CHARMS","CHERISH",
+      "COUPLE","COUPLES","CRUSH","CUDDLE","CUDDLES","CUPID","DANCE","DANCES","DARING","DARLING","DARLINGS","DATING","DEAREST",
+      "DEVOTE","DEVOTED","DEVOTION","DREAM","DREAMS","DREAMY","DREAMER","EARTH","EMBRACE","EMBRACED","ENCHANT","FOREVER",
+      "FLIRT","FLIRTS","FLOWER","FLOWERS","GENTLE","GENTLY","GLOWS","GRACE","GRACES","HAPPY","HARMONY","HEART","HEARTS",
+      "HEARTBEAT","HEARTBEATS","HONEY","HUGGED","KISSED","KISSES","LAUGH","LAUGHS","LIGHT","LIGHTS","LIVELY","LOVER","LOVERS",
+      "LOVING","LOYAL","LOYALTY","MAGIC","MARRY","MATCH","MATES","MEMORY","MOMENT","MOMENTS","PASSION","PASSIONATE","PEACE",
+      "PETAL","PETALS","PROMISE","PROMISES","ROMANCE","ROMANTIC","ROSES","SECRET","SECRETS","SERENE","SHARE","SHARED","SHARES",
+      "SHINE","SHINES","SIGHT","SIGHTS","SLIGHT","SMILE","SMILES","SPARK","SPARKS","SPARKLE","SPARKLES","SPECIAL","STARLIGHT",
+      "STARE","STARES","STARS","STEAM","STEALS","STORMY","STRONG","SUNSET","SUNSETS","SWEET","SWEETS","SWEETHEART","TENDER",
+      "TENDERLY","TOGETHER","TOUCH","TREASURE","TREASURES","TRUST","TRUSTS","TRUELOVE","UNITED","VELVET","WARMTH","WHISPER",
+      "WHISPERS","WONDER","WONDERS","WORLD","WORLDS","SOULMATE","SOULMATES","LOVEBIRD","LOVEBIRDS","AFFECTION","BELOVED",
+      "CARING","RACING","GRAIN","GRAINS","DRAIN","GRAND","GRIND","SLOWER","LOWERS","LOWER","PRIMES","PRIME","PRISM","POEMS",
+      "SPORE","SPIRE","MANOR","OCEAN","CREAM","CANOE","CRANE","ACORN","SALUTE","SALUTES","LOTUS","LOTUSES","SMART","TALES",
+      "LEAST","SLATE","TROVE","SOLVE","ROUTE","OUTER","LOUSE","ROUSE","RULES","TOURS","THEATER","THREATS","BREATHS","SHATTER",
+      "BREATHE","BREATH","THREAT","BATTER","TREAT","TEARS","BEARS","BEATS","OTHER","THERE","THREE","GREET","EGRET","OTTER",
+      "SILVER","BOILED","BIRDS","LIVED","LIVES","DEVIL","DRIVE","OLIVE","SOLID","SLIDE","STRAIGHT","ALIGHTS","RIGHTS","TRIALS",
+      "TRAILS","NIGHT","START","STAIR","TRAIL","TRIAL","SHIRT","STATIONS","POINTS","PAINTS","SAINTS","SONATAS","PIANOS",
+      "PASTAS","POINT","PAINT","SAINT","STAIN","SATIN","PIANO","PASTA","PANTS","SPENT","STEPS","STOPS","SPOTS","POSTS"
+    ];
+
+    const ENGLISH_WORD_SET = new Set(MASTER_ENGLISH_WORDS);
+
+    // Rich Curated English Seed Packs per Difficulty (Easy <=5, Normal 6-7, Hard 8-10)
+    const DIFFICULTY_POOLS = {
+      easy: [
+        { title: "Sweet Love",     subtitle: "Sunset Paris Terrace",        theme: "sunset",    note: "Every great love story begins with a single word shared between two hearts.", letters: ["L","O","V","E","R"] },
+        { title: "Warm Heart",     subtitle: "Sakura Blossom Garden",       theme: "sakura",    note: "Your smile across the screen makes my whole day brighter.",                  letters: ["H","E","A","R","T"] },
+        { title: "Pure Smile",     subtitle: "Aurora Borealis Sky",         theme: "aurora",    note: "Seeing your face on live video is my favorite part of the day.",             letters: ["S","M","I","L","E"] },
+        { title: "Dream Date",     subtitle: "Starlight Rooftop Lounge",    theme: "starlight", note: "Even miles apart, we look up at the exact same starry sky.",                 letters: ["D","R","E","A","M"] },
+        { title: "Rose Bloom",     subtitle: "Enchanted Rose Conservatory", theme: "sakura",    note: "Like a blooming rose, every moment with you feels fresh and magical.",       letters: ["R","O","S","E","S"] },
+        { title: "First Spark",    subtitle: "Maldives Overwater Villa",    theme: "ocean",     note: "One spark between two souls can light up the darkest night.",                letters: ["S","P","A","R","K"] },
+        { title: "Night Stars",    subtitle: "Velvet Midnight Balcony",     theme: "starlight", note: "Count the stars with me tonight while we solve words together.",             letters: ["S","T","A","R","S"] },
+        { title: "Honey Sweet",    subtitle: "Golden Hour Cloud Palace",    theme: "sunset",    note: "Your voice is the sweetest melody at the end of a long day.",                letters: ["S","W","E","E","T"] },
+        { title: "Pure Charm",     subtitle: "Sunset Paris Terrace",        theme: "sunset",    note: "You have a way of making every ordinary second feel special.",               letters: ["C","H","A","R","M"] },
+        { title: "Soft Blush",     subtitle: "Sakura Blossom Garden",       theme: "sakura",    note: "You still make me blush every time you look into the camera.",               letters: ["S","H","A","R","E"] },
+        { title: "True Grace",     subtitle: "Aurora Borealis Sky",         theme: "aurora",    note: "Side by side or miles apart, you are always close to my heart.",             letters: ["G","R","A","C","E"] },
+        { title: "Bright Flame",   subtitle: "Starlight Rooftop Lounge",    theme: "starlight", note: "Two phones, one secret code, and endless laughter together.",                letters: ["A","D","O","R","E"] }
+      ],
+      normal: [
+        { title: "True Lovers",     subtitle: "Sunset Paris Terrace",        theme: "sunset",    note: "Every love story starts with a tiny spark across the distance.",            letters: ["L","O","V","E","R","S"] },
+        { title: "Sweet Hearts",    subtitle: "Sakura Blossom Garden",       theme: "sakura",    note: "Miles cannot separate two hearts that speak the same language.",            letters: ["H","E","A","R","T","S"] },
+        { title: "Shared Dreams",   subtitle: "Starlight Rooftop Lounge",    theme: "starlight", note: "Looking at you on my screen feels like stargazing from home.",              letters: ["D","R","E","A","M","S"] },
+        { title: "Forever Promise", subtitle: "Golden Hour Cloud Palace",    theme: "sunset",    note: "Through every puzzle and every season, my promise is always you.",          letters: ["P","R","O","M","I","S","E"] },
+        { title: "Pure Romance",    subtitle: "Enchanted Rose Conservatory", theme: "sakura",    note: "True romance is laughing together over video call at midnight.",            letters: ["R","O","M","A","N","C","E"] },
+        { title: "Caring Soul",     subtitle: "Maldives Overwater Villa",    theme: "ocean",     note: "True closeness is not measured in miles—it is measured in care.",           letters: ["C","A","R","I","N","G","S"] },
+        { title: "Spring Flowers",  subtitle: "Aurora Borealis Sky",         theme: "aurora",    note: "Like flowers in spring, every moment with you blooms brighter.",            letters: ["F","L","O","W","E","R","S"] },
+        { title: "My Darling",      subtitle: "Velvet Midnight Balcony",     theme: "starlight", note: "You are my favorite notification and my sweetest goodnight.",               letters: ["D","A","R","L","I","N","G"] },
+        { title: "Sparkle Glow",    subtitle: "Sunset Paris Terrace",        theme: "sunset",    note: "Your eyes sparkle brighter than city lights at midnight.",                  letters: ["S","P","A","R","K","L","E"] },
+        { title: "Golden Moments",  subtitle: "Golden Hour Cloud Palace",    theme: "sunset",    note: "Every little game we play becomes a golden memory.",                        letters: ["M","O","M","E","N","T","S"] }
+      ],
+      hard: [
+        { title: "Twin Soulmates",   subtitle: "Sunset Paris Terrace",        theme: "sunset",    note: "Two souls, one heartbeat, and endless words across the miles.",            letters: ["S","O","U","L","M","A","T","E","S"] },
+        { title: "Eternal True Love",subtitle: "Sakura Blossom Garden",       theme: "sakura",    note: "True love grows stronger with every puzzle we solve together.",            letters: ["T","R","U","E","L","O","V","E","R","S"] },
+        { title: "Two Heartbeats",   subtitle: "Starlight Rooftop Lounge",    theme: "starlight", note: "Even from miles away, our heartbeats sync on every word.",                 letters: ["H","E","A","R","T","B","E","A","T","S"] },
+        { title: "Always Together",  subtitle: "Maldives Overwater Villa",    theme: "ocean",     note: "Distance is temporary, but our togetherness is forever.",                  letters: ["T","O","G","E","T","H","E","R"] },
+        { title: "Sweet Lovebirds",  subtitle: "Aurora Borealis Sky",         theme: "aurora",    note: "Like two lovebirds in the sky, every evening brings us closer.",           letters: ["L","O","V","E","B","I","R","D","S"] },
+        { title: "Velvet Starlight", subtitle: "Velvet Midnight Balcony",     theme: "starlight", note: "Under a million stars, you are still my brightest view.",                  letters: ["S","T","A","R","L","I","G","H","T"] },
+        { title: "Passionate Hearts",subtitle: "Golden Hour Cloud Palace",    theme: "sunset",    note: "Every game with you feels like a brand new adventure.",                    letters: ["P","A","S","S","I","O","N","A","T","E"] },
+        { title: "Treasured Love",   subtitle: "Enchanted Rose Conservatory", theme: "sakura",    note: "Every word we share is a treasure I keep in my heart.",                    letters: ["T","R","E","A","S","U","R","E","S"] }
+      ]
+    };
+
+    function canFormFromLetters(word, lettersArr) {
+      const counts = {};
+      for (const ch of lettersArr) counts[ch] = (counts[ch] || 0) + 1;
+      for (const ch of word) {
+        if (!counts[ch]) return false;
+        counts[ch]--;
+      }
+      return true;
+    }
+
+    function getAllEnglishWordsForWheel(lettersArr, extraCustomWords = []) {
+      const mainJoined = lettersArr.join('').toUpperCase();
+      const pool = new Set();
+      if (mainJoined.length >= 3 && ENGLISH_WORD_SET.has(mainJoined)) {
+        pool.add(mainJoined);
+      }
+      extraCustomWords.forEach((w) => {
+        const up = w.trim().toUpperCase();
+        if (up.length >= 3 && canFormFromLetters(up, lettersArr)) pool.add(up);
+      });
+      MASTER_ENGLISH_WORDS.forEach((w) => {
+        if (w.length >= 3 && w.length <= lettersArr.length && canFormFromLetters(w, lettersArr)) {
+          pool.add(w);
+        }
+      });
+      return Array.from(pool);
+    }
+
+    function generateDynamicCrossword(lettersArr, candidateWords) {
+      const validPool = candidateWords
+        .map((w) => w.trim().toUpperCase())
+        .filter((w, idx, self) => w.length >= 3 && self.indexOf(w) === idx && canFormFromLetters(w, lettersArr));
+
+      // Pick a long anchor word randomly so even the same seed pack changes anchor & intersections!
+      const minAnchorLen = Math.max(4, lettersArr.length - 2);
+      const longCandidates = validPool.filter((w) => w.length >= minAnchorLen);
+      const anchorWord = longCandidates.length > 0
+        ? longCandidates[Math.floor(Math.random() * longCandidates.length)]
+        : (validPool[0] || lettersArr.join(''));
+
+      const rest = validPool.filter((w) => w !== anchorWord);
+      for (let i = rest.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = rest[i]; rest[i] = rest[j]; rest[j] = t;
+      }
+
+      // Prefer 4+ letter words first for richer crosswords, then 3-letter words
+      const longerRest = rest.filter((w) => w.length >= 4);
+      const shorterRest = rest.filter((w) => w.length === 3);
+      const orderedRest = [...longerRest, ...shorterRest];
+
+      const targetCount = lettersArr.length <= 5 ? 5 : (lettersArr.length <= 7 ? 6 : 7);
+      const placed = [{ word: anchorWord, row: 0, col: 0, dir: 'H' }];
+      const grid = {};
+      const dirsMap = {};
+      for (let i = 0; i < anchorWord.length; i++) {
+        const k = `0,${i}`;
+        grid[k] = anchorWord[i];
+        dirsMap[k] = { H: true };
+      }
+
+      function canPlaceWord(w, r, c, d) {
+        let intersects = 0;
+        for (let i = 0; i < w.length; i++) {
+          const rr = r + (d === 'V' ? i : 0);
+          const cc = c + (d === 'H' ? i : 0);
+          const k = `${rr},${cc}`;
+          if (grid[k]) {
+            if (grid[k] !== w[i]) return false;
+            if (dirsMap[k] && dirsMap[k][d]) return false;
+            intersects++;
+          } else {
+            if (d === 'H') {
+              if (grid[`${rr - 1},${cc}`] || grid[`${rr + 1},${cc}`]) return false;
+            } else {
+              if (grid[`${rr},${cc - 1}`] || grid[`${rr},${cc + 1}`]) return false;
+            }
+          }
+        }
+        const beforeKey = d === 'V' ? `${r - 1},${c}` : `${r},${c - 1}`;
+        const afterKey = d === 'V' ? `${r + w.length},${c}` : `${r},${c + w.length}`;
+        if (grid[beforeKey] || grid[afterKey]) return false;
+        return intersects >= 1;
+      }
+
+      for (const w of orderedRest) {
+        if (placed.length >= targetCount) break;
+        const preferDirs = placed.length % 2 === 1 ? ['V', 'H'] : ['H', 'V'];
+        let placedThis = false;
+        const gridKeys = Object.keys(grid);
+        for (let i = gridKeys.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const t = gridKeys[i]; gridKeys[i] = gridKeys[j]; gridKeys[j] = t;
+        }
+        for (const k of gridKeys) {
+          if (placedThis) break;
+          const [gr, gc] = k.split(',').map(Number);
+          const gch = grid[k];
+          for (let i = 0; i < w.length; i++) {
+            if (w[i] !== gch) continue;
+            for (const d of preferDirs) {
+              const r = gr - (d === 'V' ? i : 0);
+              const c = gc - (d === 'H' ? i : 0);
+              if (canPlaceWord(w, r, c, d)) {
+                for (let m = 0; m < w.length; m++) {
+                  const rr = r + (d === 'V' ? m : 0);
+                  const cc = c + (d === 'H' ? m : 0);
+                  const ck = `${rr},${cc}`;
+                  grid[ck] = w[m];
+                  if (!dirsMap[ck]) dirsMap[ck] = {};
+                  dirsMap[ck][d] = true;
+                }
+                placed.push({ word: w, row: r, col: c, dir: d });
+                placedThis = true;
+                break;
+              }
+            }
+            if (placedThis) break;
+          }
+        }
+      }
+
+      let minR = Infinity, minC = Infinity;
+      Object.keys(grid).forEach((k) => {
+        const [r, c] = k.split(',').map(Number);
+        if (r < minR) minR = r;
+        if (c < minC) minC = c;
+      });
+      placed.forEach((p) => {
+        p.row -= minR;
+        p.col -= minC;
+      });
+
+      const placedSet = new Set(placed.map((p) => p.word));
+      const extraBonus = validPool.filter((w) => !placedSet.has(w));
+      return { placed, extraBonus };
+    }
+
+    let lastChosenKey = '';
+    function buildFreshRandomLevel(difficulty = 'normal', packIndex = null) {
+      const poolList = DIFFICULTY_POOLS[difficulty] || DIFFICULTY_POOLS.normal;
+      let chosenIdx = 0;
+      if (packIndex !== null && packIndex >= 0) {
+        chosenIdx = packIndex % poolList.length;
+      } else {
+        // Pick a different pack from the immediate previous one so it's always fresh
+        const candidates = poolList.map((_, i) => i).filter((i) => `${difficulty}_${i}` !== lastChosenKey);
+        chosenIdx = candidates[Math.floor(Math.random() * candidates.length)] || 0;
+      }
+      lastChosenKey = `${difficulty}_${chosenIdx}`;
+      const pack = poolList[chosenIdx];
+      const allEnglishWords = getAllEnglishWordsForWheel(pack.letters, [pack.letters.join('')]);
+      const { placed, extraBonus } = generateDynamicCrossword(pack.letters, allEnglishWords);
+
+      const shuffledWheel = [...pack.letters];
+      for (let i = shuffledWheel.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = shuffledWheel[i]; shuffledWheel[i] = shuffledWheel[j]; shuffledWheel[j] = t;
+      }
+
+      const diffLabel = difficulty === 'easy'
+        ? `EASY • ${pack.letters.length} LETTERS`
+        : (difficulty === 'hard' ? `HARD • ${pack.letters.length} LETTERS` : `NORMAL • ${pack.letters.length} LETTERS`);
+
+      return {
+        id: chosenIdx + 1,
+        difficulty,
+        diffLabel,
+        title: pack.title,
+        subtitle: pack.subtitle,
+        theme: pack.theme,
+        note: pack.note,
+        letters: shuffledWheel,
+        words: placed,
+        bonus: extraBonus
+      };
+    }
+
     const State = {
+      difficulty: 'normal', // 'easy' | 'normal' | 'hard'
+      roundCounter: 1,
       levelIndex: 0,
       customLevel: null,
       solvedWords: {}, // word -> 'self' | 'partner'
@@ -1357,13 +1740,24 @@
       return State.customLevel || LEVELS[State.levelIndex];
     }
 
-    function loadLevel(idx, customObj = null, broadcast = true) {
+    function updateDifficultyButtonsUI() {
+      document.querySelectorAll('.diff-btn').forEach((btn) => {
+        const isAct = btn.dataset.diff === State.difficulty;
+        btn.className = isAct
+          ? 'diff-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold transition bg-gradient-to-r from-pink-500 to-amber-400 text-white shadow'
+          : 'diff-btn px-2 py-1 rounded-xl text-[10px] sm:text-xs font-extrabold transition text-pink-100/80 hover:text-white';
+      });
+    }
+
+    function loadLevel(idx = null, customObj = null, broadcast = true) {
       if (customObj) {
         State.customLevel = customObj;
+        if (customObj.difficulty) State.difficulty = customObj.difficulty;
       } else {
-        State.customLevel = null;
-        State.levelIndex = ((idx % LEVELS.length) + LEVELS.length) % LEVELS.length;
+        State.customLevel = buildFreshRandomLevel(State.difficulty, idx);
+        State.levelIndex = State.customLevel.id - 1;
       }
+      updateDifficultyButtonsUI();
       const lv = getActiveLevel();
       State.solvedWords = {};
       State.bonusWords = [];
@@ -1371,12 +1765,10 @@
       State.wheelOrder = [...lv.letters];
       State.selectedIndices = [];
 
-      document.getElementById('levelCounterLabel').textContent = State.customLevel
-        ? 'CUSTOM COUPLE LEVEL'
-        : `LEVEL ${lv.id} / ${LEVELS.length}`;
+      document.getElementById('levelCounterLabel').textContent = lv.diffLabel || `${State.difficulty.toUpperCase()} • ${lv.letters.length} LETTERS`;
       document.getElementById('levelTitleLabel').textContent = lv.title;
       document.getElementById('loveNoteBanner').textContent = `"${lv.note}"`;
-      document.getElementById('themeSubtitleBadge').textContent = `✨ ${lv.subtitle}`;
+      document.getElementById('themeSubtitleBadge').textContent = `✨ ${lv.subtitle} (${lv.letters.length} Letters)`;
       document.getElementById('winModal').classList.add('hidden');
 
       Scene3D.setTheme(lv.theme);
@@ -1497,7 +1889,7 @@
     // 5. CIRCULAR WORDSCAPES 3D WHEEL & TOUCH/MOUSE SWIPE CONTROLLER
     // =========================================================================
     function getWheelNodeCoords(index, total) {
-      const radius = 80; // in 240x240 viewBox coordinates
+      const radius = total >= 8 ? 88 : (total >= 7 ? 83 : 78);
       const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
       return {
         x: 120 + Math.cos(angle) * radius,
@@ -1511,10 +1903,18 @@
       container.innerHTML = '';
       const total = State.wheelOrder.length;
 
+      const sizePx = total >= 9 ? 42 : (total >= 8 ? 46 : (total >= 7 ? 50 : 56));
+      const fontRem = total >= 9 ? '1.05rem' : (total >= 8 ? '1.15rem' : '1.32rem');
+
       State.wheelOrder.forEach((ch, idx) => {
         const pt = getWheelNodeCoords(idx, total);
         const btn = document.createElement('div');
         btn.className = 'wheel-letter' + (State.selectedIndices.includes(idx) ? ' selected' : '');
+        btn.style.width = `${sizePx}px`;
+        btn.style.height = `${sizePx}px`;
+        btn.style.marginLeft = `-${sizePx / 2}px`;
+        btn.style.marginTop = `-${sizePx / 2}px`;
+        btn.style.fontSize = fontRem;
         btn.style.left = `${(pt.x / 240) * 100}%`;
         btn.style.top = `${(pt.y / 240) * 100}%`;
         btn.dataset.index = idx;
@@ -1999,46 +2399,68 @@
     }
 
     // =========================================================================
-    // 8. CUSTOM COUPLE PUZZLE GENERATOR
+    // 8. CUSTOM COUPLE WORD CIRCLE GENERATOR (4 to 10 Letters + Custom Grid Words)
     // =========================================================================
+    function updateCustomCirclePreview() {
+      const previewEl = document.getElementById('customCirclePreview');
+      const inputEl = document.getElementById('customMainWord');
+      if (!previewEl || !inputEl) return;
+      const clean = (inputEl.value || '').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 10) || 'LOVE';
+      const matches = getAllEnglishWordsForWheel(clean.split(''), [clean]);
+      previewEl.innerHTML = clean.split('').map((ch) =>
+        `<span class="px-2 py-0.5 rounded-full bg-pink-500/30 border border-pink-300/40 text-xs font-extrabold text-white">${ch}</span>`
+      ).join('') + `<span class="ml-1 text-[10px] text-emerald-300 font-bold">(${matches.length} English words)</span>`;
+    }
+
     function createCustomCouplePuzzle() {
       const rawWord = (document.getElementById('customMainWord').value || '').replace(/[^a-zA-Z]/g, '').toUpperCase();
+      const rawExtra = (document.getElementById('customExtraWords').value || '').toUpperCase();
       const rawNote = (document.getElementById('customLoveNote').value || '').trim();
 
-      if (rawWord.length < 4 || rawWord.length > 6) {
-        showToast('💌', 'Please enter a 4 to 6 letter word (e.g. LAHORE or JAANUM)');
+      if (rawWord.length < 4 || rawWord.length > 10) {
+        showToast('💌', 'Please enter 4 to 10 English letters for your Custom Word Circle!');
         return;
       }
 
       const letters = rawWord.split('');
-      while (letters.length < 6) {
-        const extras = ['E', 'A', 'R', 'S', 'O', 'L'];
-        letters.push(extras[letters.length % extras.length]);
+      const userWords = rawExtra
+        .split(/[\s,]+/)
+        .map((w) => w.replace(/[^A-Z]/g, ''))
+        .filter((w) => w.length >= 3 && canFormFromLetters(w, letters));
+
+      const dictMatches = getAllEnglishWordsForWheel(letters, [rawWord, ...userWords]);
+      const combinedPool = [rawWord, ...userWords, ...dictMatches];
+
+      if (combinedPool.length < 4) {
+        combinedPool.push(rawWord.slice(0, 3));
+        combinedPool.push(rawWord.slice(1, 4));
+        combinedPool.push(rawWord[rawWord.length - 1] + rawWord.slice(0, 2));
       }
 
-      // Build intersecting sub-words from the chosen word's letters
-      const w1 = rawWord;
-      const w2 = rawWord.slice(0, 4);
-      const w3 = rawWord[rawWord.length - 1] + rawWord.slice(1, 4);
+      const { placed, extraBonus } = generateDynamicCrossword(letters, combinedPool);
+
+      const shuffled = [...letters];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = shuffled[i]; shuffled[i] = shuffled[j]; shuffled[j] = t;
+      }
 
       const customLv = {
         id: 99,
-        title: `Custom • ${w1}`,
-        subtitle: 'Personal Couple Memory',
+        difficulty: letters.length <= 5 ? 'easy' : (letters.length <= 7 ? 'normal' : 'hard'),
+        diffLabel: `CUSTOM CIRCLE • ${letters.length} LETTERS`,
+        title: `Custom • ${rawWord}`,
+        subtitle: 'Custom Couple Word Circle',
         theme: 'sakura',
-        note: rawNote || `A special puzzle crafted around "${w1}" just for the two of us.`,
-        letters: letters,
-        words: [
-          { word: w1, row: 1, col: 0, dir: 'H' },
-          { word: w2, row: 1, col: 0, dir: 'V' },
-          { word: w3, row: 0, col: w1.length - 1, dir: 'V' }
-        ],
-        bonus: [rawWord.slice(0, 3), rawWord.split('').reverse().join('').slice(0, 3)]
+        note: rawNote || `Custom Word Circle crafted with "${rawWord}" just for the two of us!`,
+        letters: shuffled,
+        words: placed,
+        bonus: extraBonus
       };
 
       document.getElementById('customWordModal').classList.add('hidden');
       loadLevel(0, customLv, true);
-      spawnFloatingReaction('💌', `Custom Puzzle: ${w1}`);
+      spawnFloatingReaction('💌', `Custom Circle: ${rawWord}`);
     }
 
     // =========================================================================
@@ -2048,18 +2470,24 @@
       const container = document.getElementById('levelListContainer');
       if (!container) return;
       container.innerHTML = '';
-      LEVELS.forEach((lv, idx) => {
+      const allPacks = [
+        ...DIFFICULTY_POOLS.easy.map((p, i) => ({ ...p, diff: 'easy', idx: i, badge: 'Easy • ≤5 Letters' })),
+        ...DIFFICULTY_POOLS.normal.map((p, i) => ({ ...p, diff: 'normal', idx: i, badge: 'Normal • 6–7 Letters' })),
+        ...DIFFICULTY_POOLS.hard.map((p, i) => ({ ...p, diff: 'hard', idx: i, badge: 'Hard • 8–10 Letters' }))
+      ];
+      allPacks.forEach((pack) => {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'ios-pill-btn p-3 rounded-2xl text-left flex flex-col justify-between gap-1';
         card.innerHTML = `
-          <div class="text-[10px] font-bold uppercase text-amber-300">Level ${lv.id} • ${lv.letters.join('')}</div>
-          <div class="text-xs font-extrabold text-white truncate">${lv.title}</div>
-          <div class="text-[10px] text-pink-200/80 truncate">${lv.subtitle}</div>
+          <div class="text-[10px] font-bold uppercase text-amber-300">${pack.badge} • ${pack.letters.join('')}</div>
+          <div class="text-xs font-extrabold text-white truncate">${pack.title}</div>
+          <div class="text-[10px] text-pink-200/80 truncate">${pack.subtitle} (Randomized Grid)</div>
         `;
         card.addEventListener('click', () => {
+          State.difficulty = pack.diff;
           document.getElementById('levelModal').classList.add('hidden');
-          loadLevel(idx, null, true);
+          loadLevel(pack.idx, null, true);
         });
         container.appendChild(card);
       });
@@ -2099,7 +2527,7 @@
       Scene3D.init();
       populateLevelModal();
       setupWheelInteraction();
-      loadLevel(0, null, false);
+      loadLevel(null, null, false);
       setupBroadcastChannelFallback(State.roomCode);
 
       // Top bar & modal triggers
@@ -2219,9 +2647,32 @@
         if (e.key === 'Enter') handleChatOrWordSend();
       });
 
-      // Next Level button in Win Modal
+      // Difficulty selector buttons (Easy <=5, Normal 6-7, Hard 8-10)
+      document.querySelectorAll('.diff-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const diff = btn.dataset.diff || 'normal';
+          State.difficulty = diff;
+          loadLevel(null, null, true);
+          const msg = diff === 'easy'
+            ? 'Easy Mode (Max 5 Letters) — Fresh board generated!'
+            : (diff === 'hard' ? 'Hard Mode (8–10 Letters) — Fresh board generated!' : 'Normal Mode (6–7 Letters) — Fresh board generated!');
+          showToast('🎯', msg);
+        });
+      });
+
+      // Fresh Random Board button ("Har Dafa New")
+      document.getElementById('btnNewRandomBoard').addEventListener('click', () => {
+        loadLevel(null, null, true);
+        SoundFX.playBonus();
+        showToast('🎲', 'Brand-new randomized crossword & wheel generated!');
+      });
+
+      // Live preview in Custom Word Circle Modal
+      document.getElementById('customMainWord').addEventListener('input', updateCustomCirclePreview);
+
+      // Next Level button in Win Modal -> always picks a fresh randomized puzzle!
       document.getElementById('btnNextLevel').addEventListener('click', () => {
-        loadLevel(State.levelIndex + 1, null, true);
+        loadLevel(null, null, true);
       });
     });
   </script>

@@ -1,10 +1,8 @@
 # IshqWords 3D — Couple Wordscapes with Live Video (Netlify Package)
 
-## Deploy in 10 Seconds on Netlify
-1. Go to https://app.netlify.com/drop
-2. Drag and drop this ZIP file (or extract and drop the folder).
-3. Open the generated `https://your-site.netlify.app` link on both phones!
-4. Both partners enter the same **Secret Code** (e.g., `LUV786`):
-   - Partner 1 taps **Create / Host Room**
-   - Partner 2 taps **Join Partner Room**
-   - Both tap **Start Cam** to stream real-time camera video & audio while solving 3D Wordscapes puzzles together!
+## Features
+- **100% Pure English Dictionary & Clues**: Romantic + everyday English words with zero non-English words.
+- **Always Fresh Procedural Puzzles**: Every round generates a brand-new randomized crossword layout & shuffled wheel.
+- **Difficulty Selection**: Easy (Max 5 letters), Normal (6–7 letters), Hard (8–10 letters).
+- **Custom Word Circle Builder**: Create your own 4–10 letter English circle & custom target words synced to your partner.
+- **Live Camera Video & Secret Code Connect**: PeerJS WebRTC P2P video & game sync across any two phones.
